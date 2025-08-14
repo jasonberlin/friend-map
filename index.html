@@ -762,6 +762,7 @@
             if (isGeocoding || !geocoder || geocodeQueue.length === 0) return;
             
             console.log('Starting geocoding for', geocodeQueue.length, 'addresses');
+            console.log('Current friends count:', friends.length);
             
             isGeocoding = true;
             document.getElementById('progressContainer').style.display = 'block';
@@ -781,6 +782,13 @@
             while (geocodeQueue.length > 0 && isGeocoding) {
                 const friend = geocodeQueue.shift();
                 
+                // Find the friend in the main array and update it
+                const friendIndex = friends.findIndex(f => f.id === friend.id);
+                if (friendIndex === -1) {
+                    console.error('Friend not found in main array:', friend.name);
+                    continue;
+                }
+                
                 // Build address - simplified for better success rate
                 const parts = [];
                 if (friend.city) parts.push(friend.city);
@@ -794,18 +802,21 @@
                     try {
                         const result = await geocodeAddress(address);
                         if (result) {
-                            friend.lat = result.lat;
-                            friend.lng = result.lng;
-                            friend.status = 'geocoded';
+                            // Update the friend in the main array
+                            friends[friendIndex].lat = result.lat;
+                            friends[friendIndex].lng = result.lng;
+                            friends[friendIndex].status = 'geocoded';
                             success++;
                             geocodeCount++;
+                            
+                            console.log(`Geocoded ${friend.name}: ${result.lat}, ${result.lng}`);
                         } else {
-                            friend.status = 'failed';
+                            friends[friendIndex].status = 'failed';
                             failed++;
                         }
                     } catch (error) {
                         console.error('Geocoding error:', error);
-                        friend.status = 'failed';
+                        friends[friendIndex].status = 'failed';
                         failed++;
                         
                         if (error.message.includes('OVER_QUERY_LIMIT')) {
@@ -817,7 +828,7 @@
                     }
                 } else {
                     console.log('Skipping invalid address for:', friend.name);
-                    friend.status = 'failed';
+                    friends[friendIndex].status = 'failed';
                     failed++;
                 }
                 
@@ -831,7 +842,9 @@
                     `Processed: ${processed}/${total} | Success: ${success} | Failed: ${failed}`;
                 
                 // Update display periodically
-                if (processed % 10 === 0) {
+                if (processed % 5 === 0 || processed === total) {
+                    console.log('Updating display - Friends with coords:', 
+                        friends.filter(f => f.lat && f.lng).length);
                     updateDisplay();
                     saveToStorage();
                 }
@@ -842,6 +855,9 @@
             
             isGeocoding = false;
             document.getElementById('progressContainer').style.display = 'none';
+            
+            console.log('Geocoding complete. Total friends:', friends.length);
+            console.log('Friends with coordinates:', friends.filter(f => f.lat && f.lng).length);
             
             updateDisplay();
             saveToStorage();
@@ -1144,6 +1160,8 @@ This will merge new contacts and update existing ones.`;
                         return;
                     }
                     
+                    console.log('Parsed', contacts.length, 'contacts from vCard');
+                    
                     if (friends.length > 0) {
                         // Check for duplicates
                         const existingNames = new Set(friends.map(f => f.name.toLowerCase()));
@@ -1159,15 +1177,22 @@ This will merge new contacts and update existing ones.`;
                         friends = friends.concat(newContacts);
                         geocodeQueue = newContacts;
                     } else {
+                        // Fresh import - make sure to set friends array
                         friends = contacts;
-                        geocodeQueue = contacts;
+                        geocodeQueue = [...contacts]; // Create copy for geocoding
+                        console.log('Set friends array with', friends.length, 'contacts');
                     }
                     
+                    // Force immediate UI update
                     updateDisplay();
                     saveToStorage();
                     
-                    showAlert('success', `Processing ${geocodeQueue.length} new contacts...`);
-                    processGeocodeQueue();
+                    showAlert('success', `Processing ${geocodeQueue.length} contacts...`);
+                    
+                    // Start geocoding after a small delay to ensure UI updates
+                    setTimeout(() => {
+                        processGeocodeQueue();
+                    }, 100);
                 }
             };
             reader.readAsText(file);
