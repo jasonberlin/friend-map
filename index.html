@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friend Map</title>
+    <title>Friend Map - Plot Your Network</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>">
     <style>
         * {
@@ -13,125 +13,218 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1c1e21;
+            line-height: 1.6;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
         
         .header {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         
-        .header h1 {
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+        
+        .logo h1 {
             font-size: 28px;
-            color: #2563eb;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        .stats {
-            margin-top: 10px;
-            color: #666;
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            font-size: 14px;
+            color: #65676b;
         }
         
-        .main-grid {
+        .main-layout {
             display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 20px;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
         }
         
         .sidebar {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            height: fit-content;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1c1e21;
         }
         
         .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
         }
         
         .btn {
-            padding: 8px 16px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         
         .btn-primary {
-            background: #2563eb;
+            background: #667eea;
             color: white;
         }
         
         .btn-primary:hover {
-            background: #1d4ed8;
+            background: #5a67d8;
+            transform: translateY(-1px);
         }
         
         .btn-success {
-            background: #16a34a;
+            background: #48bb78;
             color: white;
         }
         
         .btn-success:hover {
-            background: #15803d;
+            background: #38a169;
+            transform: translateY(-1px);
         }
         
-        .btn-purple {
-            background: #9333ea;
+        .btn-warning {
+            background: #ed8936;
             color: white;
         }
         
-        .btn-purple:hover {
-            background: #7c3aed;
-        }
-        
-        .btn-cancel {
-            background: #e5e7eb;
-            color: #333;
-        }
-        
-        .btn-cancel:hover {
-            background: #d1d5db;
+        .btn-warning:hover {
+            background: #dd6b20;
+            transform: translateY(-1px);
         }
         
         .search-box {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 15px;
+            padding: 10px 14px;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
             font-size: 14px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+        
+        .alert-warning {
+            background: #feebc8;
+            color: #744210;
+            border: 1px solid #f6ad55;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #68d391;
+        }
+        
+        .progress-container {
+            background: #f0f2f5;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e4e6eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        
+        .progress-stats {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #65676b;
         }
         
         .friends-list {
             max-height: 400px;
             overflow-y: auto;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 10px;
+            border: 1px solid #e4e6eb;
+            border-radius: 8px;
+            padding: 8px;
         }
         
-        .friend-item {
-            padding: 10px;
-            background: #f9fafb;
-            border-radius: 6px;
+        .friend-card {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
@@ -140,9 +233,9 @@
             transition: all 0.2s;
         }
         
-        .friend-item:hover {
-            background: #f3f4f6;
-            transform: translateX(5px);
+        .friend-card:hover {
+            background: #e9ecef;
+            transform: translateX(4px);
         }
         
         .friend-info {
@@ -150,48 +243,52 @@
         }
         
         .friend-name {
-            font-weight: 600;
-            margin-bottom: 4px;
+            font-weight: 500;
+            color: #1c1e21;
+            margin-bottom: 2px;
         }
         
         .friend-location {
             font-size: 12px;
-            color: #666;
+            color: #65676b;
         }
         
-        .friend-actions {
-            display: flex;
-            gap: 8px;
+        .friend-status {
+            font-size: 16px;
+            margin-right: 8px;
         }
         
-        .icon-btn {
+        .delete-btn {
             background: none;
             border: none;
+            color: #e03e3e;
             cursor: pointer;
             font-size: 18px;
+            padding: 4px;
             opacity: 0.6;
             transition: opacity 0.2s;
         }
         
-        .icon-btn:hover {
+        .delete-btn:hover {
             opacity: 1;
         }
         
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: #999;
+            padding: 48px 24px;
+            color: #65676b;
         }
         
-        .empty-state-icon {
+        .empty-icon {
             font-size: 48px;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            opacity: 0.5;
         }
         
         .map-container {
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             height: 600px;
             position: relative;
             overflow: hidden;
@@ -202,85 +299,68 @@
             height: 100%;
         }
         
-        .map-placeholder {
+        .map-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+        }
+        
+        .map-loading-content {
             text-align: center;
         }
         
+        .map-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 24px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
         .instructions {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 6px;
-            padding: 15px;
-            margin-top: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
         }
         
         .instructions h3 {
             font-size: 14px;
-            margin-bottom: 10px;
-            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1c1e21;
         }
         
         .instructions ol {
             font-size: 13px;
-            color: #2563eb;
+            color: #65676b;
             padding-left: 20px;
         }
         
         .instructions li {
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         
-        .warning {
-            background: #fef3c7;
-            border: 1px solid #fcd34d;
-            color: #92400e;
-            padding: 10px;
+        .tip {
+            background: #fff4e6;
+            border: 1px solid #ffb74d;
+            color: #e65100;
+            padding: 12px;
             border-radius: 6px;
-            margin-top: 10px;
+            margin-top: 12px;
             font-size: 12px;
-        }
-        
-        .progress-bar {
-            background: #e0f2fe;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: none;
-        }
-        
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #0369a1;
-        }
-        
-        .progress-track {
-            background: #bae6fd;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            background: #0284c7;
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        .progress-stats {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #0c4a6e;
         }
         
         .modal {
@@ -290,84 +370,101 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 9999;
         }
         
         .modal-content {
             background: white;
-            padding: 25px;
-            border-radius: 10px;
+            padding: 32px;
+            border-radius: 12px;
             width: 90%;
-            max-width: 450px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 480px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
         
-        .modal h2 {
-            margin-bottom: 20px;
-            color: #333;
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1c1e21;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
         
-        .form-group input {
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #65676b;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 10px 12px;
+            border: 2px solid #e4e6eb;
             border-radius: 6px;
             font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
         }
         
         .modal-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 24px;
         }
         
         .modal-buttons button {
             flex: 1;
-        }
-        
-        .stats-panel {
-            background: #f9fafb;
-            border-radius: 6px;
             padding: 12px;
-            margin-top: 15px;
-            font-size: 13px;
-            display: none;
         }
         
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+        .btn-cancel {
+            background: #e4e6eb;
+            color: #1c1e21;
         }
         
-        .stat-label {
-            color: #666;
+        .btn-cancel:hover {
+            background: #d1d5db;
         }
         
-        .stat-value {
-            font-weight: 600;
+        .quota-info {
+            background: #e8f4fd;
+            border: 1px solid #60a5fa;
+            color: #1e40af;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 12px;
         }
         
         @media (max-width: 768px) {
-            .main-grid {
+            .main-layout {
                 grid-template-columns: 1fr;
             }
             
             .map-container {
                 height: 400px;
+            }
+            
+            .sidebar {
+                max-height: none;
             }
         }
     </style>
@@ -375,90 +472,124 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>
-                <span>📍</span>
-                <span>Friend Map</span>
-            </h1>
-            <div class="stats">
-                <span id="friendCount">👥 0 friends</span>
-                <span id="mapStatus" style="margin-left: 20px;"></span>
+            <div class="header-content">
+                <div class="logo">
+                    <span style="font-size: 32px;">🗺️</span>
+                    <h1>Friend Map</h1>
+                </div>
+                <div class="stats-bar">
+                    <span>👥 <strong id="totalCount">0</strong> friends</span>
+                    <span>📍 <strong id="geocodedCount">0</strong> mapped</span>
+                    <span>⏳ <strong id="pendingCount">0</strong> pending</span>
+                </div>
             </div>
         </div>
         
-        <div class="main-grid">
+        <div class="main-layout">
             <div class="sidebar">
-                <h2 style="margin-bottom: 15px; font-size: 18px;">Your Friends</h2>
+                <h2 class="section-title">Manage Friends</h2>
                 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="showAddModal()">+ Add</button>
-                    <button class="btn btn-success" onclick="triggerImport()">↑ Import</button>
-                    <button class="btn btn-purple" onclick="exportData()">↓ Export</button>
+                    <button class="btn btn-primary" onclick="showAddModal()">
+                        <span>➕</span> Add
+                    </button>
+                    <button class="btn btn-success" onclick="document.getElementById('fileInput').click()">
+                        <span>📤</span> Import
+                    </button>
+                    <button class="btn btn-warning" onclick="exportData()">
+                        <span>💾</span> Export
+                    </button>
                 </div>
                 
-                <input type="file" id="fileInput" accept=".vcf,.json" style="display: none;">
+                <div class="button-group" style="margin-top: 8px;">
+                    <button class="btn btn-success" onclick="retryFailed()" title="Retry failed geocoding">
+                        <span>🔄</span> Retry
+                    </button>
+                    <button class="btn btn-primary" onclick="updateContacts()" title="Re-import to update">
+                        <span>🔄</span> Update
+                    </button>
+                    <button class="btn btn-cancel" onclick="clearAllData()" title="Clear all data">
+                        <span>🗑️</span> Clear
+                    </button>
+                </div>
                 
-                <input type="text" class="search-box" id="searchInput" placeholder="Search friends...">
+                <input type="file" id="fileInput" accept=".vcf,.json" style="display: none;" onchange="handleImport(event)">
                 
-                <div class="progress-bar" id="progressBar">
+                <div class="quota-info" id="quotaInfo">
+                    <strong>Free Tier Status:</strong><br>
+                    Maps: Unlimited views<br>
+                    Geocoding: <span id="geocodeCount">0</span> / 40,000 this month<br>
+                    <small>Resets monthly. $200 free credit covers all usage.</small>
+                </div>
+                
+                <div class="alert alert-error" id="errorAlert"></div>
+                <div class="alert alert-warning" id="warningAlert"></div>
+                <div class="alert alert-success" id="successAlert"></div>
+                
+                <input type="text" class="search-box" id="searchBox" placeholder="Search by name or location...">
+                
+                <div class="progress-container" id="progressContainer">
                     <div class="progress-header">
-                        <span>Importing contacts...</span>
+                        <span>Processing contacts...</span>
                         <span id="progressPercent">0%</span>
                     </div>
-                    <div class="progress-track">
+                    <div class="progress-bar">
                         <div class="progress-fill" id="progressFill" style="width: 0%"></div>
                     </div>
-                    <div class="progress-stats" id="progressStats"></div>
+                    <div class="progress-stats" id="progressStats">
+                        Waiting to start...
+                    </div>
+                    <button class="btn btn-cancel" style="width: 100%; margin-top: 12px;" onclick="stopGeocoding()">
+                        Stop Processing
+                    </button>
                 </div>
                 
                 <div class="friends-list" id="friendsList">
                     <div class="empty-state">
-                        <div class="empty-state-icon">👥</div>
-                        <div>No friends added yet</div>
-                        <div style="font-size: 13px; margin-top: 8px;">Add your first friend or import contacts!</div>
-                    </div>
-                </div>
-                
-                <div class="stats-panel" id="statsPanel">
-                    <div class="stat-row">
-                        <span class="stat-label">Total:</span>
-                        <span class="stat-value" id="totalStat">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">Geocoded:</span>
-                        <span class="stat-value" id="geocodedStat" style="color: #16a34a;">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">Pending:</span>
-                        <span class="stat-value" id="pendingStat" style="color: #eab308;">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">Failed:</span>
-                        <span class="stat-value" id="failedStat" style="color: #dc2626;">0</span>
+                        <div class="empty-icon">👥</div>
+                        <div style="font-weight: 500; margin-bottom: 8px;">No friends yet</div>
+                        <div style="font-size: 13px;">Import your contacts or add friends manually</div>
                     </div>
                 </div>
                 
                 <div class="instructions">
-                    <h3>📱 Import Apple Contacts</h3>
+                    <h3>📱 Import from iPhone/Mac</h3>
                     <ol>
-                        <li>Go to icloud.com → Sign in</li>
-                        <li>Open Contacts → Select All (Cmd+A)</li>
-                        <li>Settings gear → Export vCard</li>
+                        <li>Go to <strong>icloud.com</strong></li>
+                        <li>Sign in with your Apple ID</li>
+                        <li>Open <strong>Contacts</strong></li>
+                        <li>Select all (Cmd+A or Ctrl+A)</li>
+                        <li>Click gear icon → <strong>Export vCard</strong></li>
                         <li>Upload the .vcf file here</li>
                     </ol>
-                    <div class="warning">
-                        ⚡ Large imports processed in batches to avoid API limits
+                    <div class="tip">
+                        💡 <strong>Save Your Map:</strong> Use "Export" to save a backup JSON file. You can import it later to restore your map with all geocoded locations intact!
+                    </div>
+                    <div class="tip" style="margin-top: 8px;">
+                        🔄 <strong>Update Contacts:</strong> Re-import your vCard anytime. The app will automatically detect and add only new contacts.
                     </div>
                 </div>
             </div>
             
             <div class="map-container">
                 <div id="map">
-                    <div class="map-placeholder">
-                        <div>
-                            <div style="font-size: 64px; margin-bottom: 20px;">🗺️</div>
-                            <h2>Loading Google Maps...</h2>
-                            <p style="margin-top: 10px; opacity: 0.9;">Initializing with API key</p>
+                    <div class="map-loading" id="mapLoading">
+                        <div class="map-loading-content">
+                            <div style="font-size: 64px; margin-bottom: 16px;">🗺️</div>
+                            <h2>Initializing Map...</h2>
+                            <p style="margin-top: 8px; opacity: 0.9;">Loading Google Maps API</p>
                         </div>
+                    </div>
+                    <div class="map-error" id="mapError">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                        <h3>Map Loading Error</h3>
+                        <p style="margin: 16px 0; color: #65676b;">Could not load Google Maps. Check:</p>
+                        <ul style="text-align: left; color: #65676b; font-size: 14px;">
+                            <li>API key is valid</li>
+                            <li>Billing is enabled</li>
+                            <li>APIs are enabled</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="location.reload()">Retry</button>
                     </div>
                 </div>
             </div>
@@ -467,26 +598,43 @@
     
     <div class="modal" id="addModal">
         <div class="modal-content">
-            <h2>Add New Friend</h2>
+            <h2 class="modal-title">Add New Friend</h2>
             <form id="addForm" onsubmit="addFriend(event)">
                 <div class="form-group">
-                    <input type="text" id="friendName" placeholder="Name *" required>
+                    <label class="form-label">Name *</label>
+                    <input type="text" class="form-input" id="inputName" required>
                 </div>
                 <div class="form-group">
-                    <input type="text" id="friendAddress" placeholder="Street Address">
+                    <label class="form-label">Street Address</label>
+                    <input type="text" class="form-input" id="inputAddress">
                 </div>
-                <div class="form-group form-row">
-                    <input type="text" id="friendCity" placeholder="City *" required>
-                    <input type="text" id="friendState" placeholder="State *" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">City *</label>
+                        <input type="text" class="form-input" id="inputCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">State *</label>
+                        <input type="text" class="form-input" id="inputState" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">ZIP Code</label>
+                        <input type="text" class="form-input" id="inputZip">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <input type="text" class="form-input" id="inputCountry" value="USA">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <input type="text" id="friendZip" placeholder="ZIP Code">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="inputPhone">
                 </div>
                 <div class="form-group">
-                    <input type="tel" id="friendPhone" placeholder="Phone (optional)">
-                </div>
-                <div class="form-group">
-                    <input type="email" id="friendEmail" placeholder="Email (optional)">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="inputEmail">
                 </div>
                 <div class="modal-buttons">
                     <button type="submit" class="btn btn-primary">Add Friend</button>
@@ -497,162 +645,239 @@
     </div>
     
     <script>
-        // State management
+        // Global state
         let friends = [];
         let map = null;
-        let markers = [];
         let geocoder = null;
+        let markers = [];
+        let infoWindows = [];
         let geocodeQueue = [];
         let isGeocoding = false;
+        let geocodeCount = 0;
         let searchTerm = '';
-        let geocodeStats = { success: 0, failed: 0, pending: 0 };
         
-        // Initialize Google Maps
+        // Initialize map
         function initMap() {
             try {
                 const mapDiv = document.getElementById('map');
-                if (window.google && window.google.maps && mapDiv) {
-                    map = new google.maps.Map(mapDiv, {
-                        zoom: 4,
-                        center: { lat: 39.8283, lng: -98.5795 },
-                        mapTypeControl: false,
-                        streetViewControl: false
-                    });
-                    
-                    geocoder = new google.maps.Geocoder();
-                    loadSavedData();
-                    updateMapMarkers();
-                }
-            } catch (e) {
-                console.log('Map initialization error:', e);
+                if (!mapDiv) return;
+                
+                // Hide loading, show map
+                document.getElementById('mapLoading').style.display = 'none';
+                
+                map = new google.maps.Map(mapDiv, {
+                    zoom: 4,
+                    center: { lat: 39.8283, lng: -98.5795 },
+                    mapTypeControl: true,
+                    streetViewControl: false,
+                    fullscreenControl: true
+                });
+                
+                geocoder = new google.maps.Geocoder();
+                
+                // Load saved data
+                loadFromStorage();
+                updateDisplay();
+                
+                showAlert('success', 'Map loaded successfully! Ready to import contacts.');
+                
+            } catch (error) {
+                console.error('Map init error:', error);
+                showMapError();
             }
         }
         
-        // Load Google Maps script
-        if (typeof google === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&callback=initMap';
-            script.async = true;
-            document.head.appendChild(script);
+        // Show map error
+        function showMapError() {
+            document.getElementById('mapLoading').style.display = 'none';
+            document.getElementById('mapError').style.display = 'block';
+            showAlert('error', 'Failed to load Google Maps. Check console for details.');
         }
+        
+        // Load Google Maps script
+        window.gm_authFailure = function() {
+            showMapError();
+            showAlert('error', 'Google Maps authentication failed. Check your API key restrictions.');
+        };
         
         // Parse vCard
         function parseVCard(text) {
             const contacts = [];
-            const vcards = text.split('BEGIN:VCARD').filter(v => v.trim());
+            const vcards = text.split('BEGIN:VCARD');
             
-            vcards.forEach((vcard, idx) => {
-                const contact = { 
-                    id: Date.now() + idx,
-                    geocodeStatus: 'pending'
+            for (let i = 1; i < vcards.length; i++) {
+                const vcard = vcards[i];
+                const contact = {
+                    id: Date.now() + i,
+                    status: 'pending'
                 };
                 
-                const lines = vcard.split(/\r?\n/);
-                let field = '', value = '';
+                // Extract fields
+                const getField = (field) => {
+                    const regex = new RegExp(`${field}[^:]*:(.*)`, 'i');
+                    const match = vcard.match(regex);
+                    return match ? match[1].trim() : '';
+                };
                 
-                lines.forEach(line => {
-                    if (line.startsWith(' ') || line.startsWith('\t')) {
-                        value += line.substring(1);
-                    } else {
-                        if (field) processVCardField(contact, field, value);
-                        const colonIdx = line.indexOf(':');
-                        if (colonIdx > 0) {
-                            field = line.substring(0, colonIdx);
-                            value = line.substring(colonIdx + 1);
-                        }
+                // Name
+                contact.name = getField('FN');
+                if (!contact.name) {
+                    const n = getField('N');
+                    if (n) {
+                        const parts = n.split(';');
+                        contact.name = `${parts[1] || ''} ${parts[0] || ''}`.trim();
                     }
-                });
+                }
                 
-                if (field) processVCardField(contact, field, value);
+                // Phone
+                const tel = vcard.match(/TEL[^:]*:([\s\S]*?)(?:\r?\n(?=[A-Z])|\r?\n$)/);
+                if (tel) contact.phone = tel[1].replace(/[^0-9+()-\s]/g, '').trim();
                 
+                // Email
+                const email = vcard.match(/EMAIL[^:]*:([\s\S]*?)(?:\r?\n(?=[A-Z])|\r?\n$)/);
+                if (email) contact.email = email[1].trim();
+                
+                // Address
+                const adr = vcard.match(/ADR[^:]*:([\s\S]*?)(?:\r?\n(?=[A-Z])|\r?\n$)/);
+                if (adr) {
+                    const parts = adr[1].split(';');
+                    contact.address = parts[2] || '';
+                    contact.city = parts[3] || '';
+                    contact.state = parts[4] || '';
+                    contact.zip = parts[5] || '';
+                    contact.country = parts[6] || 'USA';
+                }
+                
+                // Only add if has name and location
                 if (contact.name && (contact.city || contact.state)) {
                     contacts.push(contact);
                 }
-            });
+            }
             
             return contacts;
         }
         
-        function processVCardField(contact, field, value) {
-            const decode = str => str ? str.replace(/=([0-9A-F]{2})/gi, (m, h) => 
-                String.fromCharCode(parseInt(h, 16))).replace(/=\r?\n/g, '') : '';
-            
-            if (field.includes('FN')) {
-                contact.name = decode(value);
-            } else if (field.includes('N') && !contact.name) {
-                const parts = value.split(';');
-                contact.name = (decode(parts[1] || '') + ' ' + decode(parts[0] || '')).trim();
-            } else if (field.includes('TEL')) {
-                contact.phone = value.replace(/[^\d+()-\s]/g, '');
-            } else if (field.includes('EMAIL')) {
-                contact.email = value;
-            } else if (field.includes('ADR')) {
-                const parts = value.split(';').map(decode);
-                if (parts.length >= 6) {
-                    contact.address = parts[2];
-                    contact.city = parts[3];
-                    contact.state = parts[4];
-                    contact.zipCode = parts[5];
-                }
-            }
-        }
-        
-        // Geocoding
+        // Geocoding with rate limiting
         async function processGeocodeQueue() {
             if (isGeocoding || !geocoder || geocodeQueue.length === 0) return;
             
+            console.log('Starting geocoding for', geocodeQueue.length, 'addresses');
+            
             isGeocoding = true;
-            showProgress();
+            document.getElementById('progressContainer').style.display = 'block';
+            
+            const total = geocodeQueue.length;
+            let processed = 0;
+            let success = 0;
+            let failed = 0;
+            
+            // Test with first address to check for API issues
+            if (geocodeQueue.length > 0) {
+                const testFriend = geocodeQueue[0];
+                const testAddress = [testFriend.city, testFriend.state, 'USA'].filter(Boolean).join(', ');
+                console.log('Testing geocoding with:', testAddress);
+            }
             
             while (geocodeQueue.length > 0 && isGeocoding) {
-                const batch = geocodeQueue.splice(0, 5);
+                const friend = geocodeQueue.shift();
                 
-                for (const friend of batch) {
-                    if (!isGeocoding) break;
-                    
-                    const addr = [friend.address, friend.city, friend.state, friend.zipCode]
-                        .filter(Boolean).join(', ');
-                    
-                    if (addr.length > 3) {
-                        const result = await geocodeAddress(addr);
+                // Build address - simplified for better success rate
+                const parts = [];
+                if (friend.city) parts.push(friend.city);
+                if (friend.state) parts.push(friend.state);
+                if (!friend.country || friend.country === 'USA') parts.push('USA');
+                else parts.push(friend.country);
+                
+                const address = parts.join(', ');
+                
+                if (address.length > 5 && friend.city) {
+                    try {
+                        const result = await geocodeAddress(address);
                         if (result) {
                             friend.lat = result.lat;
                             friend.lng = result.lng;
-                            friend.geocodeStatus = 'success';
-                            geocodeStats.success++;
+                            friend.status = 'geocoded';
+                            success++;
+                            geocodeCount++;
                         } else {
-                            friend.geocodeStatus = 'failed';
-                            geocodeStats.failed++;
+                            friend.status = 'failed';
+                            failed++;
                         }
-                    } else {
-                        friend.geocodeStatus = 'failed';
-                        geocodeStats.failed++;
+                    } catch (error) {
+                        console.error('Geocoding error:', error);
+                        friend.status = 'failed';
+                        failed++;
+                        
+                        if (error.message.includes('OVER_QUERY_LIMIT')) {
+                            showAlert('warning', 'Rate limit reached. Waiting 2 seconds...');
+                            await sleep(2000);
+                            geocodeQueue.unshift(friend); // Add back to queue
+                            continue;
+                        }
                     }
-                    
-                    geocodeStats.pending = geocodeQueue.length;
-                    updateProgress();
-                    await sleep(300);
+                } else {
+                    console.log('Skipping invalid address for:', friend.name);
+                    friend.status = 'failed';
+                    failed++;
                 }
                 
-                updateMapMarkers();
-                saveData();
+                processed++;
+                
+                // Update progress
+                const percent = Math.round((processed / total) * 100);
+                document.getElementById('progressPercent').textContent = `${percent}%`;
+                document.getElementById('progressFill').style.width = `${percent}%`;
+                document.getElementById('progressStats').textContent = 
+                    `Processed: ${processed}/${total} | Success: ${success} | Failed: ${failed}`;
+                
+                // Update display periodically
+                if (processed % 10 === 0) {
+                    updateDisplay();
+                    saveToStorage();
+                }
+                
+                // Rate limiting: slower to be safe
+                await sleep(100); // 10 requests per second max
             }
             
             isGeocoding = false;
-            setTimeout(hideProgress, 2000);
+            document.getElementById('progressContainer').style.display = 'none';
+            
+            updateDisplay();
+            saveToStorage();
+            
+            document.getElementById('geocodeCount').textContent = geocodeCount;
+            
+            if (success > 0) {
+                showAlert('success', `Successfully mapped ${success} friends!`);
+            } else if (failed > 0) {
+                showAlert('error', `Failed to geocode addresses. Check console for details.`);
+            }
         }
         
         function geocodeAddress(address) {
-            return new Promise(resolve => {
-                if (!geocoder) {
-                    resolve(null);
-                    return;
-                }
+            return new Promise((resolve, reject) => {
+                console.log('Geocoding address:', address);
+                
                 geocoder.geocode({ address }, (results, status) => {
-                    if (status === 'OK' && results[0]) {
-                        const loc = results[0].geometry.location;
-                        resolve({ lat: loc.lat(), lng: loc.lng() });
+                    console.log('Geocode status:', status);
+                    
+                    if (status === 'OK') {
+                        const location = results[0].geometry.location;
+                        console.log('Success! Location:', location.lat(), location.lng());
+                        resolve({ lat: location.lat(), lng: location.lng() });
+                    } else if (status === 'OVER_QUERY_LIMIT') {
+                        console.error('Rate limit hit');
+                        reject(new Error('OVER_QUERY_LIMIT'));
+                    } else if (status === 'REQUEST_DENIED') {
+                        console.error('REQUEST DENIED - Check API key and restrictions');
+                        showAlert('error', 'Geocoding denied - check API key settings');
+                        resolve(null);
+                    } else if (status === 'INVALID_REQUEST') {
+                        console.error('Invalid address:', address);
+                        resolve(null);
                     } else {
+                        console.warn('Geocode failed:', status, 'for address:', address);
                         resolve(null);
                     }
                 });
@@ -663,133 +888,348 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         
-        // UI Updates
+        function stopGeocoding() {
+            isGeocoding = false;
+            geocodeQueue = [];
+            document.getElementById('progressContainer').style.display = 'none';
+            showAlert('warning', 'Geocoding stopped by user');
+        }
+        
+        // Display functions
+        function updateDisplay() {
+            updateStats();
+            updateFriendsList();
+            updateMap();
+        }
+        
+        function updateStats() {
+            const total = friends.length;
+            const geocoded = friends.filter(f => f.status === 'geocoded').length;
+            const pending = friends.filter(f => f.status === 'pending').length;
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('geocodedCount').textContent = geocoded;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+        
         function updateFriendsList() {
             const list = document.getElementById('friendsList');
             const filtered = friends.filter(f => {
-                const s = searchTerm.toLowerCase();
-                return f.name.toLowerCase().includes(s) ||
-                       (f.city && f.city.toLowerCase().includes(s)) ||
-                       (f.state && f.state.toLowerCase().includes(s));
+                if (!searchTerm) return true;
+                const search = searchTerm.toLowerCase();
+                return f.name.toLowerCase().includes(search) ||
+                       (f.city && f.city.toLowerCase().includes(search)) ||
+                       (f.state && f.state.toLowerCase().includes(search));
             });
-            
-            document.getElementById('friendCount').textContent = `👥 ${friends.length} friends`;
             
             if (filtered.length === 0 && friends.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">👥</div>
-                        <div>No friends added yet</div>
-                        <div style="font-size: 13px; margin-top: 8px;">Add your first friend or import contacts!</div>
+                        <div class="empty-icon">👥</div>
+                        <div style="font-weight: 500; margin-bottom: 8px;">No friends yet</div>
+                        <div style="font-size: 13px;">Import your contacts or add friends manually</div>
                     </div>
                 `;
-            } else {
-                list.innerHTML = filtered.slice(0, 100).map(f => {
-                    const status = f.geocodeStatus === 'success' ? '📍' : 
-                                  f.geocodeStatus === 'pending' ? '⏳' : '❌';
-                    return `
-                        <div class="friend-item" onclick="centerOnFriend(${f.id})">
-                            <div class="friend-info">
-                                <div class="friend-name">${f.name} ${status}</div>
-                                <div class="friend-location">${f.city || 'Unknown'}, ${f.state || ''}</div>
-                            </div>
-                            <div class="friend-actions">
-                                <button class="icon-btn" onclick="event.stopPropagation(); deleteFriend(${f.id})">🗑️</button>
-                            </div>
+                return;
+            }
+            
+            list.innerHTML = filtered.slice(0, 200).map(f => {
+                const statusIcon = f.status === 'geocoded' ? '📍' : 
+                                  f.status === 'pending' ? '⏳' : '❌';
+                return `
+                    <div class="friend-card" onclick="focusOnFriend(${f.id})">
+                        <div class="friend-info">
+                            <div class="friend-name">${f.name}</div>
+                            <div class="friend-location">${f.city || 'Unknown'}, ${f.state || ''}</div>
                         </div>
-                    `;
-                }).join('');
-                
-                if (filtered.length > 100) {
-                    list.innerHTML += `<div style="text-align: center; padding: 10px; color: #999;">
-                        ... and ${filtered.length - 100} more</div>`;
-                }
+                        <span class="friend-status">${statusIcon}</span>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteFriend(${f.id})">×</button>
+                    </div>
+                `;
+            }).join('');
+            
+            if (filtered.length > 200) {
+                list.innerHTML += `<div style="text-align: center; padding: 16px; color: #65676b;">
+                    ... and ${filtered.length - 200} more</div>`;
             }
         }
         
-        function updateMapMarkers() {
+        function updateMap() {
             if (!map) return;
             
+            // Clear existing markers
             markers.forEach(m => m.setMap(null));
+            infoWindows.forEach(w => w.close());
             markers = [];
+            infoWindows = [];
             
-            const valid = friends.filter(f => f.lat && f.lng);
+            const geocoded = friends.filter(f => f.lat && f.lng);
             
-            valid.forEach(f => {
+            geocoded.forEach(friend => {
                 const marker = new google.maps.Marker({
-                    position: { lat: f.lat, lng: f.lng },
+                    position: { lat: friend.lat, lng: friend.lng },
                     map: map,
-                    title: f.name
+                    title: friend.name,
+                    animation: google.maps.Animation.DROP
                 });
                 
-                const info = new google.maps.InfoWindow({
+                const infoWindow = new google.maps.InfoWindow({
                     content: `
-                        <div style="padding: 10px;">
-                            <strong>${f.name}</strong><br>
-                            ${f.city || 'Unknown'}, ${f.state || ''}<br>
-                            ${f.phone ? '📞 ' + f.phone + '<br>' : ''}
-                            ${f.email ? '✉️ ' + f.email : ''}
+                        <div style="padding: 12px; min-width: 200px;">
+                            <h3 style="margin: 0 0 8px 0; font-size: 16px;">${friend.name}</h3>
+                            <p style="margin: 0 0 4px 0; color: #666;">📍 ${friend.city}, ${friend.state}</p>
+                            ${friend.phone ? `<p style="margin: 0 0 4px 0;">📞 ${friend.phone}</p>` : ''}
+                            ${friend.email ? `<p style="margin: 0;">✉️ ${friend.email}</p>` : ''}
                         </div>
                     `
                 });
                 
-                marker.addListener('click', () => info.open(map, marker));
+                marker.addListener('click', () => {
+                    infoWindows.forEach(w => w.close());
+                    infoWindow.open(map, marker);
+                });
+                
                 markers.push(marker);
+                infoWindows.push(infoWindow);
             });
             
-            if (markers.length > 0) {
+            // Fit bounds
+            if (geocoded.length > 0) {
                 const bounds = new google.maps.LatLngBounds();
-                valid.forEach(f => bounds.extend({ lat: f.lat, lng: f.lng }));
+                geocoded.forEach(f => bounds.extend({ lat: f.lat, lng: f.lng }));
                 map.fitBounds(bounds);
+                
+                if (geocoded.length === 1) {
+                    map.setZoom(12);
+                }
             }
-            
-            document.getElementById('mapStatus').textContent = 
-                valid.length > 0 ? `${valid.length} on map` : '';
         }
         
-        function showProgress() {
-            document.getElementById('progressBar').style.display = 'block';
-            document.getElementById('statsPanel').style.display = 'block';
-        }
-        
-        function hideProgress() {
-            document.getElementById('progressBar').style.display = 'none';
-        }
-        
-        function updateProgress() {
-            const total = geocodeStats.success + geocodeStats.failed + geocodeStats.pending;
-            const done = geocodeStats.success + geocodeStats.failed;
-            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-            
-            document.getElementById('progressPercent').textContent = percent + '%';
-            document.getElementById('progressFill').style.width = percent + '%';
-            document.getElementById('progressStats').textContent = 
-                `Processed: ${done}/${total} | Success: ${geocodeStats.success} | Failed: ${geocodeStats.failed}`;
-            
-            document.getElementById('totalStat').textContent = friends.length;
-            document.getElementById('geocodedStat').textContent = geocodeStats.success;
-            document.getElementById('pendingStat').textContent = geocodeStats.pending;
-            document.getElementById('failedStat').textContent = geocodeStats.failed;
-        }
-        
-        // Actions
-        function centerOnFriend(id) {
+        function focusOnFriend(id) {
             const friend = friends.find(f => f.id === id);
             if (friend && friend.lat && friend.lng && map) {
                 map.setCenter({ lat: friend.lat, lng: friend.lng });
-                map.setZoom(14);
+                map.setZoom(15);
+                
+                const index = friends.filter(f => f.lat && f.lng).findIndex(f => f.id === id);
+                if (index >= 0 && infoWindows[index]) {
+                    infoWindows.forEach(w => w.close());
+                    infoWindows[index].open(map, markers[index]);
+                }
             }
         }
         
         function deleteFriend(id) {
             if (confirm('Delete this friend?')) {
                 friends = friends.filter(f => f.id !== id);
-                updateFriendsList();
-                updateMapMarkers();
-                saveData();
+                updateDisplay();
+                saveToStorage();
             }
         }
         
+        // Retry failed geocoding
+        function retryFailed() {
+            const failed = friends.filter(f => f.status === 'failed' || f.status === 'pending');
+            if (failed.length === 0) {
+                showAlert('info', 'No failed geocoding to retry');
+                return;
+            }
+            
+            if (confirm(`Retry geocoding for ${failed.length} failed addresses?`)) {
+                failed.forEach(f => f.status = 'pending');
+                geocodeQueue = failed;
+                processGeocodeQueue();
+            }
+        }
+        
+        // Update contacts (re-import)
+        function updateContacts() {
+            const message = `To update contacts:
+1. Export current data (for backup)
+2. Go to iCloud.com → Contacts
+3. Export fresh vCard file
+4. Import the new file here
+
+This will merge new contacts and update existing ones.`;
+            
+            alert(message);
+            document.getElementById('fileInput').click();
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            if (confirm('⚠️ This will delete ALL friends from the map!\n\nAre you sure?')) {
+                if (confirm('Really sure? This cannot be undone!\n\nTip: Export your data first as backup.')) {
+                    friends = [];
+                    geocodeQueue = [];
+                    geocodeCount = 0;
+                    searchTerm = '';
+                    
+                    localStorage.removeItem('friendMapData');
+                    localStorage.removeItem('geocodeCount');
+                    
+                    updateDisplay();
+                    showAlert('success', 'All data cleared. Import contacts to start fresh.');
+                }
+            }
+        }
+        
+        // Enhanced export with timestamp
+        function exportData() {
+            const exportObj = {
+                version: '1.0',
+                exportDate: new Date().toISOString(),
+                totalFriends: friends.length,
+                geocoded: friends.filter(f => f.status === 'geocoded').length,
+                friends: friends
+            };
+            
+            const data = JSON.stringify(exportObj, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `friend-map-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showAlert('success', `Exported ${friends.length} friends. Save this file for backup!`);
+        }
+        
+        // Enhanced import with merge capability
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                
+                if (file.name.endsWith('.json')) {
+                    try {
+                        const imported = JSON.parse(content);
+                        const importedFriends = imported.friends || imported;
+                        
+                        if (friends.length > 0) {
+                            // Merge mode
+                            if (confirm(`You have ${friends.length} existing friends.\n\nMerge with imported data (Yes) or Replace all (No)?`)) {
+                                // Merge: Add only new friends
+                                const existingNames = new Set(friends.map(f => f.name.toLowerCase()));
+                                const newFriends = importedFriends.filter(f => 
+                                    !existingNames.has(f.name.toLowerCase())
+                                );
+                                friends = friends.concat(newFriends);
+                                showAlert('success', `Merged ${newFriends.length} new friends`);
+                            } else {
+                                // Replace
+                                friends = importedFriends;
+                                showAlert('success', `Replaced with ${friends.length} friends from backup`);
+                            }
+                        } else {
+                            friends = importedFriends;
+                            showAlert('success', `Imported ${friends.length} friends from backup`);
+                        }
+                        
+                        updateDisplay();
+                        saveToStorage();
+                        
+                    } catch (err) {
+                        showAlert('error', 'Invalid JSON file');
+                    }
+                } else if (content.includes('BEGIN:VCARD')) {
+                    const contacts = parseVCard(content);
+                    
+                    if (contacts.length === 0) {
+                        showAlert('warning', 'No contacts with addresses found');
+                        return;
+                    }
+                    
+                    if (friends.length > 0) {
+                        // Check for duplicates
+                        const existingNames = new Set(friends.map(f => f.name.toLowerCase()));
+                        const newContacts = contacts.filter(c => 
+                            !existingNames.has(c.name.toLowerCase())
+                        );
+                        const duplicates = contacts.length - newContacts.length;
+                        
+                        if (duplicates > 0) {
+                            showAlert('info', `Found ${newContacts.length} new contacts (${duplicates} duplicates skipped)`);
+                        }
+                        
+                        friends = friends.concat(newContacts);
+                        geocodeQueue = newContacts;
+                    } else {
+                        friends = contacts;
+                        geocodeQueue = contacts;
+                    }
+                    
+                    updateDisplay();
+                    saveToStorage();
+                    
+                    showAlert('success', `Processing ${geocodeQueue.length} new contacts...`);
+                    processGeocodeQueue();
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        
+        // Storage
+        function saveToStorage() {
+            try {
+                localStorage.setItem('friendMapData', JSON.stringify(friends));
+                localStorage.setItem('geocodeCount', geocodeCount.toString());
+            } catch (e) {
+                console.error('Save failed:', e);
+            }
+        }
+        
+        function loadFromStorage() {
+            try {
+                const data = localStorage.getItem('friendMapData');
+                if (data) {
+                    friends = JSON.parse(data);
+                    
+                    // Resume pending geocoding
+                    const pending = friends.filter(f => f.status === 'pending');
+                    if (pending.length > 0) {
+                        geocodeQueue = pending;
+                        showAlert('warning', `Found ${pending.length} pending geocodes. Click "Retry Failed" button or re-import to try again.`);
+                        
+                        // Add retry button
+                        const retryBtn = document.createElement('button');
+                        retryBtn.className = 'btn btn-warning';
+                        retryBtn.style.width = '100%';
+                        retryBtn.style.marginTop = '8px';
+                        retryBtn.textContent = '🔄 Retry Failed Geocoding';
+                        retryBtn.onclick = () => {
+                            const failed = friends.filter(f => f.status === 'failed' || f.status === 'pending');
+                            if (failed.length > 0) {
+                                geocodeQueue = failed;
+                                failed.forEach(f => f.status = 'pending');
+                                processGeocodeQueue();
+                            }
+                        };
+                        
+                        const buttonGroup = document.querySelector('.button-group');
+                        if (buttonGroup && !document.querySelector('.retry-btn')) {
+                            retryBtn.className = 'btn btn-warning retry-btn';
+                            buttonGroup.parentElement.insertBefore(retryBtn, buttonGroup.nextSibling);
+                        }
+                    }
+                }
+                
+                const count = localStorage.getItem('geocodeCount');
+                if (count) {
+                    geocodeCount = parseInt(count);
+                    document.getElementById('geocodeCount').textContent = geocodeCount;
+                }
+            } catch (e) {
+                console.error('Load failed:', e);
+            }
+        }
+        
+        // Modal functions
         function showAddModal() {
             document.getElementById('addModal').style.display = 'flex';
         }
@@ -799,130 +1239,72 @@
             document.getElementById('addForm').reset();
         }
         
-        function addFriend(e) {
-            e.preventDefault();
+        function addFriend(event) {
+            event.preventDefault();
             
             const friend = {
                 id: Date.now(),
-                name: document.getElementById('friendName').value,
-                address: document.getElementById('friendAddress').value,
-                city: document.getElementById('friendCity').value,
-                state: document.getElementById('friendState').value,
-                zipCode: document.getElementById('friendZip').value,
-                phone: document.getElementById('friendPhone').value,
-                email: document.getElementById('friendEmail').value,
-                geocodeStatus: 'pending'
+                name: document.getElementById('inputName').value,
+                address: document.getElementById('inputAddress').value,
+                city: document.getElementById('inputCity').value,
+                state: document.getElementById('inputState').value,
+                zip: document.getElementById('inputZip').value,
+                country: document.getElementById('inputCountry').value || 'USA',
+                phone: document.getElementById('inputPhone').value,
+                email: document.getElementById('inputEmail').value,
+                status: 'pending'
             };
             
             friends.push(friend);
             geocodeQueue.push(friend);
             
             hideAddModal();
-            updateFriendsList();
-            saveData();
+            updateDisplay();
+            saveToStorage();
             processGeocodeQueue();
         }
         
-        function triggerImport() {
-            document.getElementById('fileInput').click();
-        }
-        
-        function handleImport(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target.result;
-                
-                if (file.name.endsWith('.json')) {
-                    try {
-                        friends = JSON.parse(content);
-                        updateFriendsList();
-                        updateMapMarkers();
-                        saveData();
-                        alert(`Imported ${friends.length} contacts`);
-                    } catch (err) {
-                        alert('Invalid JSON file');
-                    }
-                } else if (content.includes('BEGIN:VCARD')) {
-                    const contacts = parseVCard(content);
-                    if (contacts.length === 0) {
-                        alert('No valid contacts found');
-                        return;
-                    }
-                    
-                    geocodeStats = { success: 0, failed: 0, pending: contacts.length };
-                    friends = friends.concat(contacts);
-                    geocodeQueue = contacts;
-                    
-                    updateFriendsList();
-                    saveData();
-                    
-                    alert(`Found ${contacts.length} contacts. Starting geocoding...`);
-                    processGeocodeQueue();
-                }
+        // Alert functions
+        function showAlert(type, message) {
+            const alerts = {
+                error: document.getElementById('errorAlert'),
+                warning: document.getElementById('warningAlert'),
+                success: document.getElementById('successAlert')
             };
-            reader.readAsText(file);
-            e.target.value = '';
-        }
-        
-        function exportData() {
-            const data = JSON.stringify(friends, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'friend-map-export.json';
-            a.click();
-        }
-        
-        function saveData() {
-            try {
-                localStorage.setItem('friendMapData', JSON.stringify(friends));
-            } catch (e) {
-                console.log('Save failed:', e);
-            }
-        }
-        
-        function loadSavedData() {
-            try {
-                const saved = localStorage.getItem('friendMapData');
-                if (saved) {
-                    friends = JSON.parse(saved);
-                    geocodeStats = {
-                        success: friends.filter(f => f.geocodeStatus === 'success').length,
-                        failed: friends.filter(f => f.geocodeStatus === 'failed').length,
-                        pending: friends.filter(f => f.geocodeStatus === 'pending').length
-                    };
-                    updateFriendsList();
-                    
-                    const pending = friends.filter(f => f.geocodeStatus === 'pending');
-                    if (pending.length > 0) {
-                        geocodeQueue = pending;
-                        processGeocodeQueue();
-                    }
-                }
-            } catch (e) {
-                console.log('Load failed:', e);
+            
+            Object.values(alerts).forEach(a => a.style.display = 'none');
+            
+            if (alerts[type]) {
+                alerts[type].textContent = message;
+                alerts[type].style.display = 'block';
+                
+                setTimeout(() => {
+                    alerts[type].style.display = 'none';
+                }, 5000);
             }
         }
         
         // Event listeners
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+        document.getElementById('searchBox').addEventListener('input', (e) => {
             searchTerm = e.target.value;
             updateFriendsList();
         });
-        
-        document.getElementById('fileInput').addEventListener('change', handleImport);
         
         document.getElementById('addModal').addEventListener('click', (e) => {
             if (e.target.id === 'addModal') hideAddModal();
         });
         
-        // Initialize
-        updateFriendsList();
-        window.initMap = initMap;
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDisplay();
+        });
+        
+        // Load Google Maps
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&callback=initMap';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
     </script>
 </body>
 </html>
