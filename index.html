@@ -5,491 +5,924 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friend Map</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            color: #2563eb;
+        }
+        
+        .stats {
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #15803d;
+        }
+        
+        .btn-purple {
+            background: #9333ea;
+            color: white;
+        }
+        
+        .btn-purple:hover {
+            background: #7c3aed;
+        }
+        
+        .btn-cancel {
+            background: #e5e7eb;
+            color: #333;
+        }
+        
+        .btn-cancel:hover {
+            background: #d1d5db;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .friends-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        .friend-item {
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .friend-item:hover {
+            background: #f3f4f6;
+            transform: translateX(5px);
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .friend-location {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .icon-btn:hover {
+            opacity: 1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .map-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .map-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .instructions {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .instructions h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #1e40af;
+        }
+        
+        .instructions ol {
+            font-size: 13px;
+            color: #2563eb;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .progress-bar {
+            background: #e0f2fe;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #0369a1;
+        }
+        
+        .progress-track {
+            background: #bae6fd;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #0284c7;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-stats {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #0c4a6e;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-buttons button {
+            flex: 1;
+        }
+        
+        .stats-panel {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                height: 400px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="app" class="min-h-screen bg-gray-50">
-        <!-- Header -->
-        <div class="bg-white shadow-sm border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center space-x-3">
-                        <svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <h1 class="text-2xl font-bold text-gray-900">Friend Map</h1>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>📍</span>
+                <span>Friend Map</span>
+            </h1>
+            <div class="stats">
+                <span id="friendCount">👥 0 friends</span>
+                <span id="mapStatus" style="margin-left: 20px;"></span>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <div class="sidebar">
+                <h2 style="margin-bottom: 15px; font-size: 18px;">Your Friends</h2>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="showAddModal()">+ Add</button>
+                    <button class="btn btn-success" onclick="triggerImport()">↑ Import</button>
+                    <button class="btn btn-purple" onclick="exportData()">↓ Export</button>
+                </div>
+                
+                <input type="file" id="fileInput" accept=".vcf,.json" style="display: none;">
+                
+                <input type="text" class="search-box" id="searchInput" placeholder="Search friends...">
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-header">
+                        <span>Importing contacts...</span>
+                        <span id="progressPercent">0%</span>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="flex items-center text-gray-600">
-                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                            </svg>
-                            <span id="friendCount">0 friends</span>
-                        </span>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-stats" id="progressStats"></div>
+                </div>
+                
+                <div class="friends-list" id="friendsList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <div>No friends added yet</div>
+                        <div style="font-size: 13px; margin-top: 8px;">Add your first friend or import contacts!</div>
+                    </div>
+                </div>
+                
+                <div class="stats-panel" id="statsPanel">
+                    <div class="stat-row">
+                        <span class="stat-label">Total:</span>
+                        <span class="stat-value" id="totalStat">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Geocoded:</span>
+                        <span class="stat-value" id="geocodedStat" style="color: #16a34a;">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Pending:</span>
+                        <span class="stat-value" id="pendingStat" style="color: #eab308;">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Failed:</span>
+                        <span class="stat-value" id="failedStat" style="color: #dc2626;">0</span>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>📱 Import Apple Contacts</h3>
+                    <ol>
+                        <li>Go to icloud.com → Sign in</li>
+                        <li>Open Contacts → Select All (Cmd+A)</li>
+                        <li>Settings gear → Export vCard</li>
+                        <li>Upload the .vcf file here</li>
+                    </ol>
+                    <div class="warning">
+                        ⚡ Large imports processed in batches to avoid API limits
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-lg font-semibold text-gray-900">Your Friends</h2>
-                            <div class="flex space-x-2">
-                                <button id="addBtn" class="bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center">
-                                    + Add
-                                </button>
-                                <button id="importBtn" class="bg-green-600 text-white px-3 py-2 rounded-md text-sm hover:bg-green-700 flex items-center">
-                                    ↑ Import
-                                </button>
-                            </div>
-                        </div>
-
-                        <input type="file" id="fileInput" accept=".vcf" style="display: none;">
-
-                        <!-- Search -->
-                        <div class="mb-4">
-                            <input type="text" id="searchInput" placeholder="Search friends..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <!-- Friends List -->
-                        <div id="friendsList" class="space-y-3 max-h-96 overflow-y-auto">
-                            <div id="emptyState" class="text-center py-8 text-gray-500">
-                                <svg class="h-12 w-12 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                </svg>
-                                <p>No friends added yet.</p>
-                                <p class="text-sm">Add your first friend to get started!</p>
-                            </div>
-                        </div>
-
-                        <!-- Import Instructions -->
-                        <div class="mt-6 p-4 bg-blue-50 rounded-md">
-                            <h4 class="text-sm font-medium text-blue-900 mb-3">📱 Import Apple Contacts</h4>
-                            <div class="space-y-2 text-xs text-blue-700">
-                                <div>1. Go to <span class="font-mono">icloud.com</span> → Sign in</div>
-                                <div>2. Click "Contacts" → Select All</div>
-                                <div>3. Export vCard → Upload here</div>
-                                <div class="mt-2 p-2 bg-amber-50 rounded text-amber-700">
-                                    💡 Only contacts with addresses will appear on the map
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Map -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div id="map" class="w-full h-96 lg:h-[600px]" style="background: #f3f4f6;">
-                            <div id="mapPlaceholder" class="w-full h-full flex items-center justify-center text-gray-500">
-                                <div class="text-center">
-                                    <svg class="h-12 w-12 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <p>Loading Google Maps...</p>
-                                    <p class="text-xs mt-2">Using your active API key</p>
-                                </div>
-                            </div>
+            
+            <div class="map-container">
+                <div id="map">
+                    <div class="map-placeholder">
+                        <div>
+                            <div style="font-size: 64px; margin-bottom: 20px;">🗺️</div>
+                            <h2>Loading Google Maps...</h2>
+                            <p style="margin-top: 10px; opacity: 0.9;">Initializing with API key</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Add Friend Modal -->
-    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-lg font-semibold mb-4">Add New Friend</h3>
-            <div class="space-y-4">
-                <input type="text" id="friendName" placeholder="Name" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                <input type="text" id="friendAddress" placeholder="Street Address" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="friendCity" placeholder="City" class="px-3 py-2 border border-gray-300 rounded-md">
-                    <input type="text" id="friendState" placeholder="State" class="px-3 py-2 border border-gray-300 rounded-md">
+    
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h2>Add New Friend</h2>
+            <form id="addForm" onsubmit="addFriend(event)">
+                <div class="form-group">
+                    <input type="text" id="friendName" placeholder="Name *" required>
                 </div>
-                <input type="text" id="friendZip" placeholder="ZIP Code" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                <input type="text" id="friendPhone" placeholder="Phone (optional)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                <input type="email" id="friendEmail" placeholder="Email (optional)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                <div class="flex space-x-4">
-                    <button id="saveFriend" class="flex-1 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">Add Friend</button>
-                    <button id="cancelAdd" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400">Cancel</button>
+                <div class="form-group">
+                    <input type="text" id="friendAddress" placeholder="Street Address">
                 </div>
-            </div>
+                <div class="form-group form-row">
+                    <input type="text" id="friendCity" placeholder="City *" required>
+                    <input type="text" id="friendState" placeholder="State *" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="friendZip" placeholder="ZIP Code">
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="friendPhone" placeholder="Phone (optional)">
+                </div>
+                <div class="form-group">
+                    <input type="email" id="friendEmail" placeholder="Email (optional)">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">Add Friend</button>
+                    <button type="button" class="btn btn-cancel" onclick="hideAddModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <!-- Contact Card Modal -->
-    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm relative">
-            <button id="closeContact" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
-            <div class="text-center mb-6">
-                <div id="contactAvatar" class="w-20 h-20 rounded-full mx-auto mb-4 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-2xl font-bold"></div>
-                <h3 id="contactName" class="text-xl font-bold text-gray-900 mb-2"></h3>
-            </div>
-            <div id="contactDetails" class="space-y-4"></div>
-            <div id="contactActions" class="mt-6 flex flex-wrap gap-2"></div>
-        </div>
-    </div>
-
+    
     <script>
-        // Friend Map App - Vanilla JavaScript
+        // State management
         let friends = [];
         let map = null;
         let markers = [];
+        let geocoder = null;
+        let geocodeQueue = [];
+        let isGeocoding = false;
         let searchTerm = '';
-
+        let geocodeStats = { success: 0, failed: 0, pending: 0 };
+        
         // Initialize Google Maps
         function initMap() {
-            if (window.google && document.getElementById('map')) {
-                const mapPlaceholder = document.getElementById('mapPlaceholder');
-                if (mapPlaceholder) mapPlaceholder.style.display = 'none';
-                
-                map = new window.google.maps.Map(document.getElementById('map'), {
-                    zoom: 4,
-                    center: { lat: 39.8283, lng: -98.5795 },
-                    styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }]
-                });
-                updateMapMarkers();
+            try {
+                const mapDiv = document.getElementById('map');
+                if (window.google && window.google.maps && mapDiv) {
+                    map = new google.maps.Map(mapDiv, {
+                        zoom: 4,
+                        center: { lat: 39.8283, lng: -98.5795 },
+                        mapTypeControl: false,
+                        streetViewControl: false
+                    });
+                    
+                    geocoder = new google.maps.Geocoder();
+                    loadSavedData();
+                    updateMapMarkers();
+                }
+            } catch (e) {
+                console.log('Map initialization error:', e);
             }
         }
-
-        // Load Google Maps
-        function loadGoogleMaps() {
+        
+        // Load Google Maps script
+        if (typeof google === 'undefined') {
             const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&libraries=geocoding&callback=initMap';
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&callback=initMap';
             script.async = true;
             document.head.appendChild(script);
         }
-
-        // Geocode address
-        async function geocodeAddress(address) {
-            return new Promise((resolve) => {
-                if (!window.google || !window.google.maps) {
-                    resolve({ lat: 40.7128 + (Math.random() - 0.5) * 20, lng: -74.0060 + (Math.random() - 0.5) * 40 });
-                    return;
-                }
-                const geocoder = new window.google.maps.Geocoder();
-                geocoder.geocode({ address }, (results, status) => {
-                    if (status === 'OK' && results[0]) {
-                        const location = results[0].geometry.location;
-                        resolve({ lat: location.lat(), lng: location.lng() });
-                    } else {
-                        resolve({ lat: 39.8283 + (Math.random() - 0.5) * 10, lng: -98.5795 + (Math.random() - 0.5) * 20 });
-                    }
-                });
-            });
-        }
-
+        
         // Parse vCard
-        function parseVCard(vcardText) {
+        function parseVCard(text) {
             const contacts = [];
-            const vcards = vcardText.split('BEGIN:VCARD');
-            vcards.forEach((vcard, index) => {
-                if (index === 0) return;
-                const lines = vcard.split('\n').map(line => line.trim()).filter(line => line);
-                const contact = { id: Date.now() + index };
+            const vcards = text.split('BEGIN:VCARD').filter(v => v.trim());
+            
+            vcards.forEach((vcard, idx) => {
+                const contact = { 
+                    id: Date.now() + idx,
+                    geocodeStatus: 'pending'
+                };
+                
+                const lines = vcard.split(/\r?\n/);
+                let field = '', value = '';
+                
                 lines.forEach(line => {
-                    if (line.startsWith('FN:')) {
-                        contact.name = line.substring(3).trim();
-                    } else if (line.startsWith('N:') && !contact.name) {
-                        const nameParts = line.substring(2).split(';');
-                        contact.name = ((nameParts[1] || '') + ' ' + (nameParts[0] || '')).trim();
-                    } else if (line.startsWith('TEL')) {
-                        const phoneMatch = line.match(/TEL[^:]*:(.*)/);
-                        if (phoneMatch && !contact.phone) contact.phone = phoneMatch[1].trim();
-                    } else if (line.startsWith('EMAIL')) {
-                        const emailMatch = line.match(/EMAIL[^:]*:(.*)/);
-                        if (emailMatch && !contact.email) contact.email = emailMatch[1].trim();
-                    } else if (line.startsWith('ADR')) {
-                        const addrMatch = line.match(/ADR[^:]*:(.*)/);
-                        if (addrMatch) {
-                            const addrParts = addrMatch[1].split(';');
-                            contact.address = addrParts[2] || '';
-                            contact.city = addrParts[3] || '';
-                            contact.state = addrParts[4] || '';
-                            contact.zipCode = addrParts[5] || '';
+                    if (line.startsWith(' ') || line.startsWith('\t')) {
+                        value += line.substring(1);
+                    } else {
+                        if (field) processVCardField(contact, field, value);
+                        const colonIdx = line.indexOf(':');
+                        if (colonIdx > 0) {
+                            field = line.substring(0, colonIdx);
+                            value = line.substring(colonIdx + 1);
                         }
                     }
                 });
-                if (contact.name && (contact.address || contact.city)) {
+                
+                if (field) processVCardField(contact, field, value);
+                
+                if (contact.name && (contact.city || contact.state)) {
                     contacts.push(contact);
                 }
             });
+            
             return contacts;
         }
-
-        // Update friends list display
-        function updateFriendsList() {
-            const friendsList = document.getElementById('friendsList');
-            const emptyState = document.getElementById('emptyState');
-            const friendCount = document.getElementById('friendCount');
+        
+        function processVCardField(contact, field, value) {
+            const decode = str => str ? str.replace(/=([0-9A-F]{2})/gi, (m, h) => 
+                String.fromCharCode(parseInt(h, 16))).replace(/=\r?\n/g, '') : '';
             
-            const filteredFriends = friends.filter(friend =>
-                friend.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                friend.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                friend.state.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            
-            friendCount.textContent = friends.length + ' friends';
-            
-            if (filteredFriends.length === 0) {
-                emptyState.style.display = 'block';
-                friendsList.innerHTML = '';
-                friendsList.appendChild(emptyState);
-            } else {
-                emptyState.style.display = 'none';
-                friendsList.innerHTML = '';
-                filteredFriends.forEach(friend => {
-                    const friendDiv = document.createElement('div');
-                    friendDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-md';
-                    friendDiv.innerHTML = `
-                        <div class="flex-1">
-                            <h3 class="font-medium text-gray-900">${friend.name}</h3>
-                            <p class="text-sm text-gray-600">${friend.city}, ${friend.state}</p>
-                        </div>
-                        <div class="flex space-x-1">
-                            <button onclick="editFriend(${friend.id})" class="p-1 text-gray-400 hover:text-blue-600">✏️</button>
-                            <button onclick="deleteFriend(${friend.id})" class="p-1 text-gray-400 hover:text-red-600">🗑️</button>
-                        </div>
-                    `;
-                    friendsList.appendChild(friendDiv);
-                });
+            if (field.includes('FN')) {
+                contact.name = decode(value);
+            } else if (field.includes('N') && !contact.name) {
+                const parts = value.split(';');
+                contact.name = (decode(parts[1] || '') + ' ' + decode(parts[0] || '')).trim();
+            } else if (field.includes('TEL')) {
+                contact.phone = value.replace(/[^\d+()-\s]/g, '');
+            } else if (field.includes('EMAIL')) {
+                contact.email = value;
+            } else if (field.includes('ADR')) {
+                const parts = value.split(';').map(decode);
+                if (parts.length >= 6) {
+                    contact.address = parts[2];
+                    contact.city = parts[3];
+                    contact.state = parts[4];
+                    contact.zipCode = parts[5];
+                }
             }
         }
-
-        // Update map markers
+        
+        // Geocoding
+        async function processGeocodeQueue() {
+            if (isGeocoding || !geocoder || geocodeQueue.length === 0) return;
+            
+            isGeocoding = true;
+            showProgress();
+            
+            while (geocodeQueue.length > 0 && isGeocoding) {
+                const batch = geocodeQueue.splice(0, 5);
+                
+                for (const friend of batch) {
+                    if (!isGeocoding) break;
+                    
+                    const addr = [friend.address, friend.city, friend.state, friend.zipCode]
+                        .filter(Boolean).join(', ');
+                    
+                    if (addr.length > 3) {
+                        const result = await geocodeAddress(addr);
+                        if (result) {
+                            friend.lat = result.lat;
+                            friend.lng = result.lng;
+                            friend.geocodeStatus = 'success';
+                            geocodeStats.success++;
+                        } else {
+                            friend.geocodeStatus = 'failed';
+                            geocodeStats.failed++;
+                        }
+                    } else {
+                        friend.geocodeStatus = 'failed';
+                        geocodeStats.failed++;
+                    }
+                    
+                    geocodeStats.pending = geocodeQueue.length;
+                    updateProgress();
+                    await sleep(300);
+                }
+                
+                updateMapMarkers();
+                saveData();
+            }
+            
+            isGeocoding = false;
+            setTimeout(hideProgress, 2000);
+        }
+        
+        function geocodeAddress(address) {
+            return new Promise(resolve => {
+                if (!geocoder) {
+                    resolve(null);
+                    return;
+                }
+                geocoder.geocode({ address }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        const loc = results[0].geometry.location;
+                        resolve({ lat: loc.lat(), lng: loc.lng() });
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // UI Updates
+        function updateFriendsList() {
+            const list = document.getElementById('friendsList');
+            const filtered = friends.filter(f => {
+                const s = searchTerm.toLowerCase();
+                return f.name.toLowerCase().includes(s) ||
+                       (f.city && f.city.toLowerCase().includes(s)) ||
+                       (f.state && f.state.toLowerCase().includes(s));
+            });
+            
+            document.getElementById('friendCount').textContent = `👥 ${friends.length} friends`;
+            
+            if (filtered.length === 0 && friends.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <div>No friends added yet</div>
+                        <div style="font-size: 13px; margin-top: 8px;">Add your first friend or import contacts!</div>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = filtered.slice(0, 100).map(f => {
+                    const status = f.geocodeStatus === 'success' ? '📍' : 
+                                  f.geocodeStatus === 'pending' ? '⏳' : '❌';
+                    return `
+                        <div class="friend-item" onclick="centerOnFriend(${f.id})">
+                            <div class="friend-info">
+                                <div class="friend-name">${f.name} ${status}</div>
+                                <div class="friend-location">${f.city || 'Unknown'}, ${f.state || ''}</div>
+                            </div>
+                            <div class="friend-actions">
+                                <button class="icon-btn" onclick="event.stopPropagation(); deleteFriend(${f.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (filtered.length > 100) {
+                    list.innerHTML += `<div style="text-align: center; padding: 10px; color: #999;">
+                        ... and ${filtered.length - 100} more</div>`;
+                }
+            }
+        }
+        
         function updateMapMarkers() {
             if (!map) return;
             
-            // Clear existing markers
-            markers.forEach(marker => marker.setMap(null));
+            markers.forEach(m => m.setMap(null));
             markers = [];
             
-            friends.forEach(friend => {
-                if (friend.lat && friend.lng) {
-                    const marker = new window.google.maps.Marker({
-                        position: { lat: friend.lat, lng: friend.lng },
-                        map: map,
-                        title: friend.name,
-                        icon: {
-                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#EF4444"><path d="M12 0C7.802 0 4.4 3.403 4.4 7.602 4.4 11.8 12 24 12 24s7.6-12.2 7.6-16.398C19.6 3.403 16.197 0 12 0zM12 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>'),
-                            scaledSize: new window.google.maps.Size(32, 32)
-                        }
-                    });
-                    
-                    marker.addListener('click', () => showContactCard(friend));
-                    markers.push(marker);
-                }
+            const valid = friends.filter(f => f.lat && f.lng);
+            
+            valid.forEach(f => {
+                const marker = new google.maps.Marker({
+                    position: { lat: f.lat, lng: f.lng },
+                    map: map,
+                    title: f.name
+                });
+                
+                const info = new google.maps.InfoWindow({
+                    content: `
+                        <div style="padding: 10px;">
+                            <strong>${f.name}</strong><br>
+                            ${f.city || 'Unknown'}, ${f.state || ''}<br>
+                            ${f.phone ? '📞 ' + f.phone + '<br>' : ''}
+                            ${f.email ? '✉️ ' + f.email : ''}
+                        </div>
+                    `
+                });
+                
+                marker.addListener('click', () => info.open(map, marker));
+                markers.push(marker);
             });
             
-            // Fit map to markers
             if (markers.length > 0) {
-                const bounds = new window.google.maps.LatLngBounds();
-                friends.forEach(friend => {
-                    if (friend.lat && friend.lng) {
-                        bounds.extend({ lat: friend.lat, lng: friend.lng });
-                    }
-                });
+                const bounds = new google.maps.LatLngBounds();
+                valid.forEach(f => bounds.extend({ lat: f.lat, lng: f.lng }));
                 map.fitBounds(bounds);
             }
+            
+            document.getElementById('mapStatus').textContent = 
+                valid.length > 0 ? `${valid.length} on map` : '';
         }
-
-        // Show contact card
-        function showContactCard(friend) {
-            const modal = document.getElementById('contactModal');
-            const avatar = document.getElementById('contactAvatar');
-            const name = document.getElementById('contactName');
-            const details = document.getElementById('contactDetails');
-            const actions = document.getElementById('contactActions');
-            
-            avatar.textContent = friend.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-            name.textContent = friend.name;
-            
-            details.innerHTML = '';
-            actions.innerHTML = '';
-            
-            if (friend.phone) {
-                details.innerHTML += `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">📞</div>
-                        <div>
-                            <p class="text-sm text-gray-500">Phone</p>
-                            <p class="text-gray-900 font-medium">${friend.phone}</p>
-                        </div>
-                    </div>
-                `;
-                actions.innerHTML += `<a href="tel:${friend.phone}" class="bg-green-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-green-700">Call</a>`;
-            }
-            
-            if (friend.email) {
-                details.innerHTML += `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">✉️</div>
-                        <div>
-                            <p class="text-sm text-gray-500">Email</p>
-                            <p class="text-gray-900 font-medium">${friend.email}</p>
-                        </div>
-                    </div>
-                `;
-                actions.innerHTML += `<a href="mailto:${friend.email}" class="bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700">Email</a>`;
-            }
-            
-            details.innerHTML += `
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">📍</div>
-                    <div>
-                        <p class="text-sm text-gray-500">Address</p>
-                        <p class="text-gray-900 font-medium">
-                            ${friend.address ? friend.address + ', ' : ''}${friend.city}, ${friend.state} ${friend.zipCode}
-                        </p>
-                    </div>
-                </div>
-            `;
-            
-            actions.innerHTML += `<button onclick="editFriend(${friend.id}); closeContactCard();" class="bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-700">Edit</button>`;
-            
-            modal.style.display = 'flex';
+        
+        function showProgress() {
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('statsPanel').style.display = 'block';
         }
-
-        // Close contact card
-        function closeContactCard() {
-            document.getElementById('contactModal').style.display = 'none';
+        
+        function hideProgress() {
+            document.getElementById('progressBar').style.display = 'none';
         }
-
-        // Add friend
-        async function addFriend() {
-            const name = document.getElementById('friendName').value;
-            const address = document.getElementById('friendAddress').value;
-            const city = document.getElementById('friendCity').value;
-            const state = document.getElementById('friendState').value;
-            const zipCode = document.getElementById('friendZip').value;
-            const phone = document.getElementById('friendPhone').value;
-            const email = document.getElementById('friendEmail').value;
+        
+        function updateProgress() {
+            const total = geocodeStats.success + geocodeStats.failed + geocodeStats.pending;
+            const done = geocodeStats.success + geocodeStats.failed;
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
             
-            if (!name || !city || !state) {
-                alert('Please fill in name, city, and state');
-                return;
-            }
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressStats').textContent = 
+                `Processed: ${done}/${total} | Success: ${geocodeStats.success} | Failed: ${geocodeStats.failed}`;
             
-            const fullAddress = address + ', ' + city + ', ' + state + ' ' + zipCode;
-            const coords = await geocodeAddress(fullAddress);
-            
-            friends.push({
-                id: Date.now(),
-                name, address, city, state, zipCode, phone, email,
-                lat: coords.lat,
-                lng: coords.lng
-            });
-            
-            // Clear form
-            document.getElementById('friendName').value = '';
-            document.getElementById('friendAddress').value = '';
-            document.getElementById('friendCity').value = '';
-            document.getElementById('friendState').value = '';
-            document.getElementById('friendZip').value = '';
-            document.getElementById('friendPhone').value = '';
-            document.getElementById('friendEmail').value = '';
-            
-            document.getElementById('addModal').style.display = 'none';
-            updateFriendsList();
-            updateMapMarkers();
+            document.getElementById('totalStat').textContent = friends.length;
+            document.getElementById('geocodedStat').textContent = geocodeStats.success;
+            document.getElementById('pendingStat').textContent = geocodeStats.pending;
+            document.getElementById('failedStat').textContent = geocodeStats.failed;
         }
-
-        // Edit friend
-        function editFriend(id) {
+        
+        // Actions
+        function centerOnFriend(id) {
             const friend = friends.find(f => f.id === id);
-            if (friend) {
-                document.getElementById('friendName').value = friend.name;
-                document.getElementById('friendAddress').value = friend.address;
-                document.getElementById('friendCity').value = friend.city;
-                document.getElementById('friendState').value = friend.state;
-                document.getElementById('friendZip').value = friend.zipCode;
-                document.getElementById('friendPhone').value = friend.phone || '';
-                document.getElementById('friendEmail').value = friend.email || '';
-                document.getElementById('addModal').style.display = 'flex';
+            if (friend && friend.lat && friend.lng && map) {
+                map.setCenter({ lat: friend.lat, lng: friend.lng });
+                map.setZoom(14);
             }
         }
-
-        // Delete friend
+        
         function deleteFriend(id) {
-            friends = friends.filter(f => f.id !== id);
-            updateFriendsList();
-            updateMapMarkers();
+            if (confirm('Delete this friend?')) {
+                friends = friends.filter(f => f.id !== id);
+                updateFriendsList();
+                updateMapMarkers();
+                saveData();
+            }
         }
-
-        // Handle file upload
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
+        
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+        }
+        
+        function hideAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('addForm').reset();
+        }
+        
+        function addFriend(e) {
+            e.preventDefault();
+            
+            const friend = {
+                id: Date.now(),
+                name: document.getElementById('friendName').value,
+                address: document.getElementById('friendAddress').value,
+                city: document.getElementById('friendCity').value,
+                state: document.getElementById('friendState').value,
+                zipCode: document.getElementById('friendZip').value,
+                phone: document.getElementById('friendPhone').value,
+                email: document.getElementById('friendEmail').value,
+                geocodeStatus: 'pending'
+            };
+            
+            friends.push(friend);
+            geocodeQueue.push(friend);
+            
+            hideAddModal();
+            updateFriendsList();
+            saveData();
+            processGeocodeQueue();
+        }
+        
+        function triggerImport() {
+            document.getElementById('fileInput').click();
+        }
+        
+        function handleImport(e) {
+            const file = e.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
-            reader.onload = async (e) => {
+            reader.onload = (e) => {
                 const content = e.target.result;
-                if (content.includes('BEGIN:VCARD')) {
-                    const vcardContacts = parseVCard(content);
-                    let importedCount = 0;
-                    
-                    for (const contact of vcardContacts) {
-                        if (contact.name && (contact.address || contact.city)) {
-                            const fullAddress = contact.address ? 
-                                contact.address + ', ' + contact.city + ', ' + contact.state + ' ' + contact.zipCode :
-                                contact.city + ', ' + contact.state + ' ' + contact.zipCode;
-                            
-                            try {
-                                const coords = await geocodeAddress(fullAddress.trim());
-                                friends.push({ ...contact, lat: coords.lat, lng: coords.lng });
-                                importedCount++;
-                            } catch (error) {
-                                console.error('Error geocoding:', contact.name);
-                            }
-                        }
-                    }
-                    
-                    if (importedCount > 0) {
-                        alert('Successfully imported ' + importedCount + ' contacts with addresses!');
+                
+                if (file.name.endsWith('.json')) {
+                    try {
+                        friends = JSON.parse(content);
                         updateFriendsList();
                         updateMapMarkers();
-                    } else {
-                        alert('No contacts with addresses found in the file.');
+                        saveData();
+                        alert(`Imported ${friends.length} contacts`);
+                    } catch (err) {
+                        alert('Invalid JSON file');
                     }
+                } else if (content.includes('BEGIN:VCARD')) {
+                    const contacts = parseVCard(content);
+                    if (contacts.length === 0) {
+                        alert('No valid contacts found');
+                        return;
+                    }
+                    
+                    geocodeStats = { success: 0, failed: 0, pending: contacts.length };
+                    friends = friends.concat(contacts);
+                    geocodeQueue = contacts;
+                    
+                    updateFriendsList();
+                    saveData();
+                    
+                    alert(`Found ${contacts.length} contacts. Starting geocoding...`);
+                    processGeocodeQueue();
                 }
             };
             reader.readAsText(file);
+            e.target.value = '';
         }
-
+        
+        function exportData() {
+            const data = JSON.stringify(friends, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'friend-map-export.json';
+            a.click();
+        }
+        
+        function saveData() {
+            try {
+                localStorage.setItem('friendMapData', JSON.stringify(friends));
+            } catch (e) {
+                console.log('Save failed:', e);
+            }
+        }
+        
+        function loadSavedData() {
+            try {
+                const saved = localStorage.getItem('friendMapData');
+                if (saved) {
+                    friends = JSON.parse(saved);
+                    geocodeStats = {
+                        success: friends.filter(f => f.geocodeStatus === 'success').length,
+                        failed: friends.filter(f => f.geocodeStatus === 'failed').length,
+                        pending: friends.filter(f => f.geocodeStatus === 'pending').length
+                    };
+                    updateFriendsList();
+                    
+                    const pending = friends.filter(f => f.geocodeStatus === 'pending');
+                    if (pending.length > 0) {
+                        geocodeQueue = pending;
+                        processGeocodeQueue();
+                    }
+                }
+            } catch (e) {
+                console.log('Load failed:', e);
+            }
+        }
+        
         // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            loadGoogleMaps();
-            
-            document.getElementById('addBtn').onclick = () => document.getElementById('addModal').style.display = 'flex';
-            document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
-            document.getElementById('cancelAdd').onclick = () => document.getElementById('addModal').style.display = 'none';
-            document.getElementById('saveFriend').onclick = addFriend;
-            document.getElementById('closeContact').onclick = closeContactCard;
-            document.getElementById('fileInput').onchange = handleFileUpload;
-            document.getElementById('searchInput').oninput = (e) => {
-                searchTerm = e.target.value;
-                updateFriendsList();
-            };
-            
-            // Close modals when clicking outside
-            document.getElementById('addModal').onclick = (e) => {
-                if (e.target.id === 'addModal') document.getElementById('addModal').style.display = 'none';
-            };
-            document.getElementById('contactModal').onclick = (e) => {
-                if (e.target.id === 'contactModal') closeContactCard();
-            };
-            
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
             updateFriendsList();
         });
+        
+        document.getElementById('fileInput').addEventListener('change', handleImport);
+        
+        document.getElementById('addModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addModal') hideAddModal();
+        });
+        
+        // Initialize
+        updateFriendsList();
+        window.initMap = initMap;
     </script>
 </body>
 </html>
