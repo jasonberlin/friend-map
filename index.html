@@ -15,50 +15,6 @@
     
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-        
-        // Icon Components
-        const MapPin = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-        );
-        
-        const Users = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-            </svg>
-        );
-        
-        const Plus = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-        );
-        
-        const Upload = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-        );
-        
-        const Search = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-        );
-        
-        const Edit3 = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-        );
-        
-        const Trash2 = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-        );
 
         const FriendMap = () => {
           const [friends, setFriends] = useState([]);
@@ -338,6 +294,47 @@
             friend.state.toLowerCase().includes(searchTerm.toLowerCase())
           );
 
+          // Helper function to render contact card action buttons
+          const renderActionButtons = () => {
+            const buttons = [];
+            
+            if (selectedFriend.phone) {
+              buttons.push(
+                
+                  key="call"
+                  href={`tel:${selectedFriend.phone}`}
+                  className="bg-green-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-green-700 transition-colors"
+                >
+                  Call
+                </a>
+              );
+            }
+            
+            if (selectedFriend.email) {
+              buttons.push(
+                
+                  key="email"
+                  href={`mailto:${selectedFriend.email}`}
+                  className="bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Email
+                </a>
+              );
+            }
+            
+            buttons.push(
+              <button
+                key="edit"
+                onClick={() => handleEditFriend(selectedFriend)}
+                className="bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors col-span-1"
+              >
+                Edit
+              </button>
+            );
+            
+            return buttons;
+          };
+
           return (
             <div className="min-h-screen bg-gray-50">
               {/* Header */}
@@ -345,12 +342,17 @@
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-between h-16">
                     <div className="flex items-center space-x-3">
-                      <MapPin className="h-8 w-8 text-red-500" />
+                      <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
                       <h1 className="text-2xl font-bold text-gray-900">Friend Map</h1>
                     </div>
                     <div className="flex items-center space-x-4">
                       <span className="flex items-center text-gray-600">
-                        <Users className="h-5 w-5 mr-2" />
+                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                        </svg>
                         {friends.length} friends
                       </span>
                     </div>
@@ -370,14 +372,18 @@
                             onClick={() => setShowAddForm(true)}
                             className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center"
                           >
-                            <Plus className="h-4 w-4 mr-1" />
+                            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
                             Add
                           </button>
                           <button
                             onClick={() => fileInputRef.current.click()}
                             className="bg-green-600 text-white px-3 py-2 rounded-md text-sm hover:bg-green-700 flex items-center"
                           >
-                            <Upload className="h-4 w-4 mr-1" />
+                            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
                             Import
                           </button>
                         </div>
@@ -394,7 +400,9 @@
                       {/* Search */}
                       <div className="mb-4">
                         <div className="relative">
-                          <Search className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+                          <svg className="h-5 w-5 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
                           <input
                             type="text"
                             placeholder="Search friends..."
@@ -418,13 +426,17 @@
                                 onClick={() => handleEditFriend(friend)}
                                 className="p-1 text-gray-400 hover:text-blue-600"
                               >
-                                <Edit3 className="h-4 w-4" />
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
                               </button>
                               <button
                                 onClick={() => handleDeleteFriend(friend.id)}
                                 className="p-1 text-gray-400 hover:text-red-600"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                               </button>
                             </div>
                           </div>
@@ -433,7 +445,9 @@
 
                       {friends.length === 0 && (
                         <div className="text-center py-8 text-gray-500">
-                          <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                          <svg className="h-12 w-12 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                          </svg>
                           <p>No friends added yet.</p>
                           <p className="text-sm">Add your first friend to get started!</p>
                         </div>
@@ -465,7 +479,10 @@
                         {!window.google && (
                           <div className="w-full h-full flex items-center justify-center text-gray-500">
                             <div className="text-center">
-                              <MapPin className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                              <svg className="h-12 w-12 mx-auto mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
                               <p>Loading Google Maps...</p>
                               <p className="text-xs mt-2">Using your active API key</p>
                             </div>
@@ -582,20 +599,7 @@
                     </button>
 
                     <div className="text-center mb-6">
-                      {selectedFriend.photo ? (
-                        <img
-                          src={selectedFriend.photo.startsWith('data:') ? selectedFriend.photo : `data:image/jpeg;base64,${selectedFriend.photo}`}
-                          alt={selectedFriend.name}
-                          className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={`w-20 h-20 rounded-full mx-auto mb-4 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-2xl font-bold ${selectedFriend.photo ? 'hidden' : 'flex'}`}
-                      >
+                      <div className="w-20 h-20 rounded-full mx-auto mb-4 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
                         {selectedFriend.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedFriend.name}</h3>
@@ -632,7 +636,10 @@
 
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                          <MapPin className="h-5 w-5 text-red-600" />
+                          <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Address</p>
@@ -645,28 +652,7 @@
                     </div>
 
                     <div className="mt-6 grid grid-cols-2 gap-3">
-                      {selectedFriend.phone && (
-                        
-                          href={`tel:${selectedFriend.phone}`}
-                          className="bg-green-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-green-700 transition-colors"
-                        >
-                          Call
-                        </a>
-                      )}
-                      {selectedFriend.email && (
-                        
-                          href={`mailto:${selectedFriend.email}`}
-                          className="bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors"
-                        >
-                          Email
-                        </a>
-                      )}
-                      <button
-                        onClick={() => handleEditFriend(selectedFriend)}
-                        className="bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors col-span-1"
-                      >
-                        Edit
-                      </button>
+                      {renderActionButtons()}
                     </div>
                   </div>
                 </div>
