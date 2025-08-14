@@ -294,47 +294,6 @@
             friend.state.toLowerCase().includes(searchTerm.toLowerCase())
           );
 
-          // Helper function to render contact card action buttons
-          const renderActionButtons = () => {
-            const buttons = [];
-            
-            if (selectedFriend.phone) {
-              buttons.push(
-                
-                  key="call"
-                  href={`tel:${selectedFriend.phone}`}
-                  className="bg-green-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-green-700 transition-colors"
-                >
-                  Call
-                </a>
-              );
-            }
-            
-            if (selectedFriend.email) {
-              buttons.push(
-                
-                  key="email"
-                  href={`mailto:${selectedFriend.email}`}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Email
-                </a>
-              );
-            }
-            
-            buttons.push(
-              <button
-                key="edit"
-                onClick={() => handleEditFriend(selectedFriend)}
-                className="bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors col-span-1"
-              >
-                Edit
-              </button>
-            );
-            
-            return buttons;
-          };
-
           return (
             <div className="min-h-screen bg-gray-50">
               {/* Header */}
@@ -651,8 +610,29 @@
                       </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-2 gap-3">
-                      {renderActionButtons()}
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {selectedFriend.phone && (
+                        
+                          href={`tel:${selectedFriend.phone}`}
+                          className="bg-green-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-green-700 transition-colors"
+                        >
+                          Call
+                        </a>
+                      )}
+                      {selectedFriend.email && (
+                        
+                          href={`mailto:${selectedFriend.email}`}
+                          className="bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors"
+                        >
+                          Email
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleEditFriend(selectedFriend)}
+                        className="bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
+                      >
+                        Edit
+                      </button>
                     </div>
                   </div>
                 </div>
