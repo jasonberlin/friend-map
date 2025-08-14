@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friend Map</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -15,31 +16,46 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
-        // Simple icon components
-        const MapPin = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-        );
+        const MapPin = ({ className }) => React.createElement("svg", {
+            className: className,
+            fill: "none",
+            viewBox: "0 0 24 24",
+            stroke: "currentColor"
+        }, React.createElement("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: 2,
+            d: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+        }), React.createElement("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: 2,
+            d: "M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+        }));
         
-        const Users = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-            </svg>
-        );
+        const Users = ({ className }) => React.createElement("svg", {
+            className: className,
+            fill: "none",
+            viewBox: "0 0 24 24",
+            stroke: "currentColor"
+        }, React.createElement("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: 2,
+            d: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+        }));
         
-        const Plus = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-        );
-        
-        const Upload = ({ className }) => (
-            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-        );
+        const Plus = ({ className }) => React.createElement("svg", {
+            className: className,
+            fill: "none",
+            viewBox: "0 0 24 24",
+            stroke: "currentColor"
+        }, React.createElement("path", {
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            strokeWidth: 2,
+            d: "M12 4v16m8-8H4"
+        }));
 
         const FriendMap = () => {
           const [friends, setFriends] = useState([]);
@@ -49,266 +65,225 @@
             address: '',
             city: '',
             state: '',
-            zipCode: '',
-            phone: '',
-            email: ''
+            zipCode: ''
           });
-          const mapRef = useRef(null);
-          const [map, setMap] = useState(null);
-          const fileInputRef = useRef(null);
 
-          // Initialize map
-          useEffect(() => {
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&libraries=geocoding`;
-            script.async = true;
-            script.defer = true;
-            script.onload = initMap;
-            document.head.appendChild(script);
-
-            return () => {
-              document.head.removeChild(script);
-            };
-          }, []);
-
-          const initMap = () => {
-            if (mapRef.current && window.google) {
-              const mapInstance = new window.google.maps.Map(mapRef.current, {
-                zoom: 4,
-                center: { lat: 39.8283, lng: -98.5795 }
-              });
-              setMap(mapInstance);
-            }
-          };
-
-          const geocodeAddress = async (address) => {
-            return new Promise((resolve) => {
-              if (!window.google || !window.google.maps) {
-                resolve({
-                  lat: 40.7128 + (Math.random() - 0.5) * 20,
-                  lng: -74.0060 + (Math.random() - 0.5) * 40
-                });
-                return;
-              }
-
-              const geocoder = new window.google.maps.Geocoder();
-              geocoder.geocode({ address }, (results, status) => {
-                if (status === 'OK' && results[0]) {
-                  const location = results[0].geometry.location;
-                  resolve({
-                    lat: location.lat(),
-                    lng: location.lng()
-                  });
-                } else {
-                  resolve({
-                    lat: 39.8283 + (Math.random() - 0.5) * 10,
-                    lng: -98.5795 + (Math.random() - 0.5) * 20
-                  });
-                }
-              });
-            });
-          };
-
-          const handleAddFriend = async () => {
+          const handleAddFriend = () => {
             if (!newFriend.name || !newFriend.city || !newFriend.state) {
+              alert('Please fill in name, city, and state');
               return;
             }
             
-            const fullAddress = `${newFriend.address}, ${newFriend.city}, ${newFriend.state} ${newFriend.zipCode}`;
-            const coords = await geocodeAddress(fullAddress);
-            
-            const friendWithCoords = {
+            const friendWithId = {
               ...newFriend,
-              id: Date.now(),
-              lat: coords.lat,
-              lng: coords.lng
+              id: Date.now()
             };
             
-            setFriends([...friends, friendWithCoords]);
+            setFriends([...friends, friendWithId]);
             setNewFriend({
               name: '',
               address: '',
               city: '',
               state: '',
-              zipCode: '',
-              phone: '',
-              email: ''
+              zipCode: ''
             });
             setShowAddForm(false);
-
-            // Add marker to map
-            if (map && window.google) {
-              new window.google.maps.Marker({
-                position: { lat: coords.lat, lng: coords.lng },
-                map: map,
-                title: newFriend.name
-              });
-            }
           };
 
-          const handleFileUpload = (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            alert(`File "${file.name}" selected! VCF parsing will be added in the next update.`);
-          };
-
-          return (
-            <div className="min-h-screen bg-gray-50">
-              <div className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="h-8 w-8 text-red-500" />
-                      <h1 className="text-2xl font-bold text-gray-900">Friend Map</h1>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span className="flex items-center text-gray-600">
-                        <Users className="h-5 w-5 mr-2" />
-                        {friends.length} friends
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-1">
-                    <div className="bg-white rounded-lg shadow p-6">
-                      <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-gray-900">Your Friends</h2>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => setShowAddForm(true)}
-                            className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center"
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Add
-                          </button>
-                          <button
-                            onClick={() => fileInputRef.current.click()}
-                            className="bg-green-600 text-white px-3 py-2 rounded-md text-sm hover:bg-green-700 flex items-center"
-                          >
-                            <Upload className="h-4 w-4 mr-1" />
-                            Import
-                          </button>
-                        </div>
-                      </div>
-
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        accept=".vcf"
-                        className="hidden"
-                      />
-
-                      <div className="space-y-3">
-                        {friends.map((friend) => (
-                          <div key={friend.id} className="p-3 bg-gray-50 rounded-md">
-                            <h3 className="font-medium text-gray-900">{friend.name}</h3>
-                            <p className="text-sm text-gray-600">{friend.city}, {friend.state}</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {friends.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                          <p>No friends added yet.</p>
-                          <p className="text-sm">Add your first friend to get started!</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-2">
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                      <div
-                        ref={mapRef}
-                        className="w-full h-96 lg:h-[600px]"
-                        style={{ background: '#f3f4f6' }}
-                      >
-                        {!window.google && (
-                          <div className="w-full h-full flex items-center justify-center text-gray-500">
-                            <div className="text-center">
-                              <MapPin className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                              <p>Loading Google Maps...</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {showAddForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                  <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                    <h3 className="text-lg font-semibold mb-4">Add New Friend</h3>
-                    <div className="space-y-4">
-                      <input
-                        type="text"
-                        placeholder="Name"
-                        value={newFriend.name}
-                        onChange={(e) => setNewFriend({...newFriend, name: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Street Address"
-                        value={newFriend.address}
-                        onChange={(e) => setNewFriend({...newFriend, address: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      />
-                      <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder="City"
-                          value={newFriend.city}
-                          onChange={(e) => setNewFriend({...newFriend, city: e.target.value})}
-                          className="px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                        <input
-                          type="text"
-                          placeholder="State"
-                          value={newFriend.state}
-                          onChange={(e) => setNewFriend({...newFriend, state: e.target.value})}
-                          className="px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="ZIP Code"
-                        value={newFriend.zipCode}
-                        onChange={(e) => setNewFriend({...newFriend, zipCode: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      />
-                      <div className="flex space-x-4">
-                        <button
-                          onClick={handleAddFriend}
-                          className="flex-1 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
-                        >
-                          Add Friend
-                        </button>
-                        <button
-                          onClick={() => setShowAddForm(false)}
-                          className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+          return React.createElement("div", {
+            className: "min-h-screen bg-gray-50"
+          }, 
+            React.createElement("div", {
+              className: "bg-white shadow-sm border-b"
+            },
+              React.createElement("div", {
+                className: "max-w-7xl mx-auto px-4 py-4"
+              },
+                React.createElement("div", {
+                  className: "flex items-center justify-between"
+                },
+                  React.createElement("div", {
+                    className: "flex items-center space-x-3"
+                  },
+                    React.createElement(MapPin, {
+                      className: "h-8 w-8 text-red-500"
+                    }),
+                    React.createElement("h1", {
+                      className: "text-2xl font-bold text-gray-900"
+                    }, "Friend Map")
+                  ),
+                  React.createElement("div", {
+                    className: "flex items-center space-x-4"
+                  },
+                    React.createElement("span", {
+                      className: "flex items-center text-gray-600"
+                    },
+                      React.createElement(Users, {
+                        className: "h-5 w-5 mr-2"
+                      }),
+                      `${friends.length} friends`
+                    )
+                  )
+                )
+              )
+            ),
+            React.createElement("div", {
+              className: "max-w-7xl mx-auto px-4 py-8"
+            },
+              React.createElement("div", {
+                className: "grid grid-cols-1 lg:grid-cols-3 gap-8"
+              },
+                React.createElement("div", {
+                  className: "lg:col-span-1"
+                },
+                  React.createElement("div", {
+                    className: "bg-white rounded-lg shadow p-6"
+                  },
+                    React.createElement("div", {
+                      className: "flex items-center justify-between mb-6"
+                    },
+                      React.createElement("h2", {
+                        className: "text-lg font-semibold text-gray-900"
+                      }, "Your Friends"),
+                      React.createElement("button", {
+                        onClick: () => setShowAddForm(true),
+                        className: "bg-blue-600 text-white px-3 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center"
+                      },
+                        React.createElement(Plus, {
+                          className: "h-4 w-4 mr-1"
+                        }),
+                        "Add"
+                      )
+                    ),
+                    React.createElement("div", {
+                      className: "space-y-3"
+                    },
+                      friends.length === 0 ? 
+                        React.createElement("div", {
+                          className: "text-center py-8 text-gray-500"
+                        },
+                          React.createElement(Users, {
+                            className: "h-12 w-12 mx-auto mb-4 text-gray-300"
+                          }),
+                          React.createElement("p", null, "No friends added yet."),
+                          React.createElement("p", {
+                            className: "text-sm"
+                          }, "Add your first friend to get started!")
+                        ) :
+                        friends.map((friend) => 
+                          React.createElement("div", {
+                            key: friend.id,
+                            className: "p-3 bg-gray-50 rounded-md"
+                          },
+                            React.createElement("h3", {
+                              className: "font-medium text-gray-900"
+                            }, friend.name),
+                            React.createElement("p", {
+                              className: "text-sm text-gray-600"
+                            }, `${friend.city}, ${friend.state}`)
+                          )
+                        )
+                    )
+                  )
+                ),
+                React.createElement("div", {
+                  className: "lg:col-span-2"
+                },
+                  React.createElement("div", {
+                    className: "bg-white rounded-lg shadow overflow-hidden"
+                  },
+                    React.createElement("div", {
+                      className: "w-full h-96 lg:h-[600px] bg-gray-100 flex items-center justify-center"
+                    },
+                      React.createElement("div", {
+                        className: "text-center"
+                      },
+                        React.createElement(MapPin, {
+                          className: "h-12 w-12 mx-auto mb-4 text-gray-300"
+                        }),
+                        React.createElement("p", {
+                          className: "text-gray-500"
+                        }, "Map will load here"),
+                        React.createElement("p", {
+                          className: "text-xs text-gray-400 mt-2"
+                        }, "Add friends to see them on the map!")
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+            showAddForm && React.createElement("div", {
+              className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            },
+              React.createElement("div", {
+                className: "bg-white rounded-lg p-6 w-full max-w-md"
+              },
+                React.createElement("h3", {
+                  className: "text-lg font-semibold mb-4"
+                }, "Add New Friend"),
+                React.createElement("div", {
+                  className: "space-y-4"
+                },
+                  React.createElement("input", {
+                    type: "text",
+                    placeholder: "Name",
+                    value: newFriend.name,
+                    onChange: (e) => setNewFriend({...newFriend, name: e.target.value}),
+                    className: "w-full px-3 py-2 border border-gray-300 rounded-md"
+                  }),
+                  React.createElement("input", {
+                    type: "text",
+                    placeholder: "Street Address (optional)",
+                    value: newFriend.address,
+                    onChange: (e) => setNewFriend({...newFriend, address: e.target.value}),
+                    className: "w-full px-3 py-2 border border-gray-300 rounded-md"
+                  }),
+                  React.createElement("div", {
+                    className: "grid grid-cols-2 gap-4"
+                  },
+                    React.createElement("input", {
+                      type: "text",
+                      placeholder: "City",
+                      value: newFriend.city,
+                      onChange: (e) => setNewFriend({...newFriend, city: e.target.value}),
+                      className: "px-3 py-2 border border-gray-300 rounded-md"
+                    }),
+                    React.createElement("input", {
+                      type: "text",
+                      placeholder: "State",
+                      value: newFriend.state,
+                      onChange: (e) => setNewFriend({...newFriend, state: e.target.value}),
+                      className: "px-3 py-2 border border-gray-300 rounded-md"
+                    })
+                  ),
+                  React.createElement("input", {
+                    type: "text",
+                    placeholder: "ZIP Code (optional)",
+                    value: newFriend.zipCode,
+                    onChange: (e) => setNewFriend({...newFriend, zipCode: e.target.value}),
+                    className: "w-full px-3 py-2 border border-gray-300 rounded-md"
+                  }),
+                  React.createElement("div", {
+                    className: "flex space-x-4"
+                  },
+                    React.createElement("button", {
+                      onClick: handleAddFriend,
+                      className: "flex-1 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+                    }, "Add Friend"),
+                    React.createElement("button", {
+                      onClick: () => setShowAddForm(false),
+                      className: "flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400"
+                    }, "Cancel")
+                  )
+                )
+              )
+            )
           );
         };
 
-        ReactDOM.render(<FriendMap />, document.getElementById('root'));
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(FriendMap));
     </script>
 </body>
 </html>
