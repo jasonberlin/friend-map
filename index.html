@@ -986,6 +986,14 @@
                     position: { lat: friend.lat, lng: friend.lng },
                     map: map,
                     title: friend.name,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 4, // Small dot
+                        fillColor: '#FF4444',
+                        fillOpacity: 0.8,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 1.5
+                    },
                     animation: google.maps.Animation.DROP
                 });
                 
@@ -1003,6 +1011,29 @@
                 marker.addListener('click', () => {
                     infoWindows.forEach(w => w.close());
                     infoWindow.open(map, marker);
+                });
+                
+                // Add hover effect for better visibility
+                marker.addListener('mouseover', () => {
+                    marker.setIcon({
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 6, // Slightly larger on hover
+                        fillColor: '#FF0000',
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2
+                    });
+                });
+                
+                marker.addListener('mouseout', () => {
+                    marker.setIcon({
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 4, // Back to small
+                        fillColor: '#FF4444',
+                        fillOpacity: 0.8,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 1.5
+                    });
                 });
                 
                 markers.push(marker);
