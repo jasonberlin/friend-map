@@ -41,7 +41,7 @@
           // Initialize Google Maps
           useEffect(() => {
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&libraries=geocoding`;
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCAHA2rJUh_pVQgH_N-AFc35UEfiR5jr70&libraries=geocoding';
             script.async = true;
             script.defer = true;
             script.onload = initMap;
@@ -117,7 +117,8 @@
                     contact.name = line.substring(3).trim();
                   } else if (line.startsWith('N:') && !contact.name) {
                     const nameParts = line.substring(2).split(';');
-                    contact.name = `${nameParts[1] || ''} ${nameParts[0] || ''}`.trim();
+                    contact.name = (nameParts[1] || '') + ' ' + (nameParts[0] || '');
+                    contact.name = contact.name.trim();
                   }
                 } else if (line.startsWith('TEL')) {
                   const phoneMatch = line.match(/TEL[^:]*:(.*)/);
@@ -169,9 +170,12 @@
                 
                 for (const contact of vcardContacts) {
                   if (contact.name && (contact.address || contact.city)) {
-                    const fullAddress = contact.address ? 
-                      `${contact.address}, ${contact.city}, ${contact.state} ${contact.zipCode}` :
-                      `${contact.city}, ${contact.state} ${contact.zipCode}`;
+                    let fullAddress = '';
+                    if (contact.address) {
+                      fullAddress = contact.address + ', ' + contact.city + ', ' + contact.state + ' ' + contact.zipCode;
+                    } else {
+                      fullAddress = contact.city + ', ' + contact.state + ' ' + contact.zipCode;
+                    }
                     
                     try {
                       const coords = await geocodeAddress(fullAddress.trim());
@@ -189,7 +193,7 @@
               
               if (newFriends.length > 0) {
                 setFriends([...friends, ...newFriends]);
-                alert(`Successfully imported ${newFriends.length} contacts with addresses!`);
+                alert('Successfully imported ' + newFriends.length + ' contacts with addresses!');
               } else {
                 alert('No contacts with addresses found in the file.');
               }
@@ -210,11 +214,11 @@
                   map: map,
                   title: friend.name,
                   icon: {
-                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#EF4444">
-                        <path d="M12 0C7.802 0 4.4 3.403 4.4 7.602 4.4 11.8 12 24 12 24s7.6-12.2 7.6-16.398C19.6 3.403 16.197 0 12 0zM12 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                      </svg>
-                    `),
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+                      '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#EF4444">' +
+                      '<path d="M12 0C7.802 0 4.4 3.403 4.4 7.602 4.4 11.8 12 24 12 24s7.6-12.2 7.6-16.398C19.6 3.403 16.197 0 12 0zM12 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>' +
+                      '</svg>'
+                    ),
                     scaledSize: new window.google.maps.Size(32, 32)
                   }
                 });
@@ -247,7 +251,7 @@
               return;
             }
             
-            const fullAddress = `${newFriend.address}, ${newFriend.city}, ${newFriend.state} ${newFriend.zipCode}`;
+            const fullAddress = newFriend.address + ', ' + newFriend.city + ', ' + newFriend.state + ' ' + newFriend.zipCode;
             const coords = await geocodeAddress(fullAddress);
             
             const friendWithCoords = {
@@ -293,6 +297,16 @@
             friend.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
             friend.state.toLowerCase().includes(searchTerm.toLowerCase())
           );
+
+          // Helper function to get phone link
+          const getPhoneLink = () => {
+            return 'tel:' + selectedFriend.phone;
+          };
+
+          // Helper function to get email link
+          const getEmailLink = () => {
+            return 'mailto:' + selectedFriend.email;
+          };
 
           return (
             <div className="min-h-screen bg-gray-50">
@@ -603,7 +617,7 @@
                         <div>
                           <p className="text-sm text-gray-500">Address</p>
                           <p className="text-gray-900 font-medium">
-                            {selectedFriend.address && `${selectedFriend.address}, `}
+                            {selectedFriend.address && selectedFriend.address + ', '}
                             {selectedFriend.city}, {selectedFriend.state} {selectedFriend.zipCode}
                           </p>
                         </div>
@@ -613,7 +627,7 @@
                     <div className="mt-6 flex flex-wrap gap-2">
                       {selectedFriend.phone && (
                         
-                          href={`tel:${selectedFriend.phone}`}
+                          href={getPhoneLink()}
                           className="bg-green-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-green-700 transition-colors"
                         >
                           Call
@@ -621,7 +635,7 @@
                       )}
                       {selectedFriend.email && (
                         
-                          href={`mailto:${selectedFriend.email}`}
+                          href={getEmailLink()}
                           className="bg-blue-600 text-white py-2 px-4 rounded-lg text-center text-sm font-medium hover:bg-blue-700 transition-colors"
                         >
                           Email
