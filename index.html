@@ -988,11 +988,11 @@
                     title: friend.name,
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        scale: 4, // Small dot
+                        scale: 6, // Medium-sized dot (was 4, now 6)
                         fillColor: '#FF4444',
-                        fillOpacity: 0.8,
+                        fillOpacity: 0.9,
                         strokeColor: '#FFFFFF',
-                        strokeWeight: 1.5
+                        strokeWeight: 2
                     },
                     animation: google.maps.Animation.DROP
                 });
@@ -1000,10 +1000,20 @@
                 const infoWindow = new google.maps.InfoWindow({
                     content: `
                         <div style="padding: 12px; min-width: 200px;">
-                            <h3 style="margin: 0 0 8px 0; font-size: 16px;">${friend.name}</h3>
-                            <p style="margin: 0 0 4px 0; color: #666;">📍 ${friend.city}, ${friend.state}</p>
-                            ${friend.phone ? `<p style="margin: 0 0 4px 0;">📞 ${friend.phone}</p>` : ''}
-                            ${friend.email ? `<p style="margin: 0;">✉️ ${friend.email}</p>` : ''}
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                ${friend.photo ? 
+                                    `<img src="${friend.photo}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 12px;" onerror="this.style.display='none';">` : 
+                                    `<div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                        ${friend.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                                    </div>`
+                                }
+                                <div>
+                                    <h3 style="margin: 0; font-size: 16px;">${friend.name}</h3>
+                                    <p style="margin: 4px 0 0 0; color: #666; font-size: 13px;">📍 ${friend.city}, ${friend.state}</p>
+                                </div>
+                            </div>
+                            ${friend.phone ? `<p style="margin: 4px 0;">📞 ${friend.phone}</p>` : ''}
+                            ${friend.email ? `<p style="margin: 4px 0;">✉️ ${friend.email}</p>` : ''}
                         </div>
                     `
                 });
@@ -1017,22 +1027,22 @@
                 marker.addListener('mouseover', () => {
                     marker.setIcon({
                         path: google.maps.SymbolPath.CIRCLE,
-                        scale: 6, // Slightly larger on hover
+                        scale: 8, // Larger on hover (was 6, now 8)
                         fillColor: '#FF0000',
                         fillOpacity: 1,
                         strokeColor: '#FFFFFF',
-                        strokeWeight: 2
+                        strokeWeight: 2.5
                     });
                 });
                 
                 marker.addListener('mouseout', () => {
                     marker.setIcon({
                         path: google.maps.SymbolPath.CIRCLE,
-                        scale: 4, // Back to small
+                        scale: 6, // Back to medium (was 4, now 6)
                         fillColor: '#FF4444',
-                        fillOpacity: 0.8,
+                        fillOpacity: 0.9,
                         strokeColor: '#FFFFFF',
-                        strokeWeight: 1.5
+                        strokeWeight: 2
                     });
                 });
                 
